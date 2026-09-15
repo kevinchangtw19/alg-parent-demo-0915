@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>親子演算法對話卡</title>
+<style>
+:root{
+  --bg:#F3EDE1; --surface:#FBF7F0; --line:#E2D6C0; --line-soft:#EFE7D8;
+  --ink:#241F1A; --ink-2:#5F574C; --ink-3:#9A9084;
+  --clay:#C97A45; --clay-deep:#A85D2E; --clay-tint:#FBEEE1; --clay-line:#EBD3B4;
+  --moss:#4E8A62; --moss-deep:#3A6B4B; --moss-tint:#E7F0E7; --moss-line:#CDE0D2;
+  --r-sm:10px; --r-md:16px; --r-lg:20px; --r-xl:26px; --r-pill:999px;
+  --sh-1:0 2px 8px rgba(74,58,38,.07); --sh-2:0 8px 22px rgba(74,58,38,.12); --sh-3:0 20px 44px rgba(74,58,38,.22);
+  --serif:"Noto Serif TC","Songti TC","Times New Roman",serif;
+  --sans:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --fs-body:16.5px;   /* 主要內容字級（手機基準） */
+  --fs-title:23px;
+  --deck-w:236px; --deck-h:322px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:radial-gradient(120% 60% at 50% -8%,#FDF1DF 0%,rgba(253,241,223,0) 60%),var(--bg);
+  color:var(--ink);font-family:var(--sans);line-height:1.8;
+  -webkit-font-smoothing:antialiased;min-height:100vh;
+}
+.app{max-width:520px;margin:0 auto;padding:18px 16px 30px;min-height:100vh;display:flex;flex-direction:column}
+.view{display:none;flex:1;flex-direction:column}
+.view.on{display:flex}
+
+/* ============ 平板：字級與牌疊放大 ============ */
+@media(min-width:560px){
+  :root{--fs-body:17.5px;--fs-title:25px;--deck-w:252px;--deck-h:344px}
+}
+
+/* ============ 桌機：自動套手機外框；可切寬版 ============ */
+.viewtoggle{display:none}
+@media(min-width:900px){
+  .viewtoggle{
+    display:block;position:fixed;top:16px;right:16px;z-index:60;
+    border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-pill);
+    padding:10px 18px;font:700 14px var(--sans);color:var(--ink);cursor:pointer;box-shadow:var(--sh-1)
+  }
+  body.framed{padding:30px 0}
+  body.framed .app{
+    max-width:430px;height:calc(100vh - 60px);min-height:0;overflow-y:auto;
+    background:var(--surface);border-radius:46px;padding:30px 22px 26px;
+    box-shadow:0 0 0 12px #2A2621, 0 30px 70px rgba(74,58,38,.32)
+  }
+  body.framed .app::-webkit-scrollbar{width:0}
+  body.wide{padding:20px 0}
+  body.wide .app{max-width:760px}
+  body.wide{--fs-body:18px;--fs-title:27px}
+  body.wide .list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  body.wide .cats{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+}
+
+/* ================= 首頁 ================= */
+.head{text-align:center;padding:14px 4px 6px}
+.head .kick{font-size:11px;font-weight:800;letter-spacing:.24em;color:var(--clay)}
+.head h1{font-family:var(--serif);font-size:27px;line-height:1.35;margin:9px 0 6px;letter-spacing:.02em}
+.head p{margin:0;font-size:14.5px;color:var(--ink-2)}
+.cats{display:flex;flex-direction:column;gap:13px;margin-top:20px}
+.cat{position:relative;display:flex;align-items:center;gap:14px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:var(--sh-1);padding:0;overflow:hidden;cursor:pointer;
+  transition:transform .18s var(--ease),box-shadow .18s var(--ease);
+  text-align:left;width:100%;font-family:inherit;color:inherit}
+.cat:active{transform:scale(.985)}
+.cat:hover{box-shadow:var(--sh-2)}
+.cat .edge{width:10px;align-self:stretch;flex:none}
+.cat .body{flex:1;padding:17px 4px 17px 0}
+.cat .nm{font-family:var(--serif);font-size:21px;font-weight:700;line-height:1.4;display:block}
+.cat .sub{font-size:13px;color:var(--ink-3);margin-top:1px;display:block}
+.cat .cnt{flex:none;padding-right:17px;text-align:right}
+.cat .cnt b{font-family:var(--mono);font-size:23px;font-weight:700;color:var(--clay-deep);line-height:1;display:block}
+.cat .cnt span{display:block;font-size:11px;color:var(--ink-3);margin-top:3px}
+.tip{text-align:center;font-size:13px;color:var(--ink-3);margin-top:18px}
+.allbtn{margin-top:14px;width:100%;border:1.5px dashed var(--clay-line);background:var(--clay-tint);
+  border-radius:var(--r-lg);padding:15px;font:700 15.5px var(--sans);color:var(--clay-deep);cursor:pointer}
+.allbtn:active{transform:scale(.99)}
+
+/* ================= 共用頂列 ================= */
+.bar2{display:flex;align-items:center;gap:10px;padding:4px 0 2px}
+.back-btn{border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-pill);
+  padding:8px 14px;font:700 13.5px var(--sans);color:var(--ink-2);cursor:pointer;flex:none}
+.bar2 .ti{flex:1;text-align:center;min-width:0}
+.bar2 .ti .n{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1.3}
+.bar2 .ti .c{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);letter-spacing:.06em}
+.bar2 .sp{width:52px;flex:none}
+
+/* 模式切換 */
+.seg{display:flex;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-pill);
+  padding:3px;gap:2px;margin:12px auto 2px;width:fit-content}
+.seg button{border:none;background:none;font:700 14px var(--sans);color:var(--ink-2);
+  padding:9px 22px;border-radius:var(--r-pill);cursor:pointer;transition:.16s var(--ease)}
+.seg button[aria-pressed="true"]{background:var(--clay);color:#fff}
+
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:16px 0 8px;min-height:360px}
+
+/* ================= 牌疊 ================= */
+.deckwrap{display:flex;flex-direction:column;align-items:center;gap:20px;padding:10px 0}
+.deck{position:relative;width:var(--deck-w);height:var(--deck-h);cursor:pointer}
+.back{position:absolute;inset:0;border-radius:var(--r-xl);
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 7px,rgba(0,0,0,0) 7px 14px),
+    linear-gradient(150deg,var(--clay) 0%,#B4693C 45%,var(--moss) 100%);
+  border:1px solid rgba(255,255,255,.22);box-shadow:0 7px 18px rgba(74,58,38,.20);
+  display:flex;align-items:center;justify-content:center;will-change:transform;backface-visibility:hidden}
+.back .mono{width:78px;height:78px;border-radius:50%;border:2px solid rgba(255,255,255,.55);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:31px;color:#fff;letter-spacing:.04em;background:rgba(255,255,255,.10)}
+.back .cap{position:absolute;bottom:22px;left:0;right:0;text-align:center;
+  font-size:11.5px;letter-spacing:.22em;color:rgba(255,255,255,.78);font-weight:700}
+.back.fly{transition:transform 190ms var(--ease),opacity 190ms var(--ease);
+  transform:translateY(-58px) scale(1.1) rotateY(90deg)!important;opacity:0}
+.deckhint{font-size:14px;color:var(--ink-2);text-align:center}
+.deckhint b{color:var(--clay-deep)}
+.mini-btn{border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-pill);
+  padding:9px 18px;font:700 13.5px var(--sans);color:var(--ink);cursor:pointer}
+.mini-btn:active{transform:scale(.97)}
+
+/* ================= 卡片 ================= */
+.cardzone{width:100%;perspective:1100px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);
+  box-shadow:var(--sh-3);overflow:hidden;transform-origin:50% 40%}
+.card.in{animation:cardIn 200ms var(--ease) both}
+.card.out{animation:cardOut 340ms var(--ease) both}
+@keyframes cardIn{from{transform:rotateY(-90deg) scale(.94);opacity:0}to{transform:none;opacity:1}}
+@keyframes cardOut{to{transform:translateY(120px) scale(.55);opacity:.22}}
+.card .cbar{height:9px}
+.card .pad{padding:18px 19px 22px}
+.card .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:11px}
+.chip{font-size:11.5px;font-weight:800;border-radius:var(--r-pill);padding:3px 11px;border:1px solid}
+.cid{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--ink-3);letter-spacing:.08em}
+.lvl{font-size:11px;font-weight:800;border-radius:var(--r-pill);padding:3px 10px;border:1px solid}
+.lvl.高{background:#FBEEDA;color:#8A6414;border-color:#EEDDB4}
+.lvl.中{background:var(--moss-tint);color:var(--moss-deep);border-color:var(--moss-line)}
+.lvl.低{background:#F1EBE0;color:#7A7064;border-color:var(--line)}
+.card h2{font-family:var(--serif);font-size:var(--fs-title);line-height:1.45;margin:0 0 13px;letter-spacing:.02em}
+.algo{font-size:var(--fs-body);line-height:1.8;white-space:pre-wrap;color:var(--ink)}
+details{margin-top:13px;border-top:1px solid var(--line-soft);padding-top:11px}
+summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;
+  font-size:14px;font-weight:700;color:var(--clay-deep);padding:3px 0}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"＋";font-family:var(--mono);font-size:13px;width:19px;height:19px;flex:none;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:var(--clay-tint);border:1px solid var(--clay-line);color:var(--clay-deep)}
+details[open] summary::before{content:"－"}
+.sub{font-size:15.5px;line-height:1.8;white-space:pre-wrap;color:var(--ink-2);margin-top:9px;
+  background:var(--clay-tint);border:1px solid var(--clay-line);border-radius:var(--r-md);padding:12px 14px}
+.sub.cite{background:#F4F0E7;border-color:var(--line);font-size:14.5px;color:#5F574C}
+.actions{display:flex;gap:11px;margin-top:15px;padding-bottom:4px}
+.actions button{flex:1;border-radius:var(--r-pill);padding:15px 10px;font:700 16px var(--sans);
+  cursor:pointer;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);transition:.16s var(--ease)}
+.actions button:active{transform:scale(.975)}
+.actions .go{background:var(--clay);border-color:var(--clay);color:#fff}
+.actions .ok{background:var(--moss);border-color:var(--moss);color:#fff}
+
+/* ================= 列表模式 ================= */
+.list{display:flex;flex-direction:column;gap:10px;width:100%;padding:4px 0}
+.li{display:flex;align-items:center;gap:0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-md);overflow:hidden;cursor:pointer;width:100%;min-height:62px;
+  text-align:left;font-family:inherit;color:inherit;transition:.16s var(--ease);box-shadow:var(--sh-1)}
+.li:active{transform:scale(.99)}
+.li:hover{box-shadow:var(--sh-2)}
+.li .lb{width:7px;align-self:stretch;flex:none}
+.li .lt{flex:1;padding:11px 12px;min-width:0}
+.li .lid{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.08em}
+.li .lname{display:block;font-size:16px;font-weight:700;line-height:1.55;margin-top:1px}
+.li .rt{flex:none;padding-right:12px;display:flex;align-items:center;gap:7px}
+.li .tick{font-size:14px;color:var(--moss)}
+.grp{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--ink-3);
+  margin:18px 0 8px;display:flex;align-items:center;gap:8px}
+.grp .gl{width:22px;height:4px;border-radius:9px;flex:none}
+.grp:first-child{margin-top:4px}
+
+/* ================= 完成／已看過 ================= */
+.fin{text-align:center;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-xl);box-shadow:var(--sh-2);padding:32px 22px;width:100%}
+.fin .ic{font-size:40px;line-height:1}
+.fin h3{font-family:var(--serif);font-size:23px;margin:12px 0 7px}
+.fin p{font-size:14.5px;color:var(--ink-2);margin:0 0 20px}
+.fin .btns{display:flex;flex-direction:column;gap:10px}
+.fin button{border-radius:var(--r-pill);padding:14px;font:700 15.5px var(--sans);cursor:pointer;
+  border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.fin button.pri{background:var(--moss);border-color:var(--moss);color:#fff}
+.seen{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.seen .lb2{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--ink-3);margin-bottom:9px}
+.strip{display:flex;gap:9px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+.strip::-webkit-scrollbar{height:4px}
+.strip::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+.scard{flex:none;width:126px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-md);overflow:hidden;cursor:pointer;opacity:.68;transition:.16s var(--ease)}
+.scard:active{transform:scale(.97)}
+.scard:hover{opacity:1;box-shadow:var(--sh-1)}
+.scard .sb{height:5px}
+.scard .sp2{padding:8px 10px 10px}
+.scard .si{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.06em}
+.scard .sn{font-size:13px;font-weight:700;line-height:1.5;margin-top:2px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+.foot{text-align:center;font-size:11.5px;line-height:1.85;color:var(--ink-3);
+  margin-top:22px;padding-top:14px;border-top:1px solid var(--line-soft)}
+</style>
+</head>
+<body>
+<button class="viewtoggle" id="vt">🖥 寬版閱讀</button>
+<div class="app">
+
+  <!-- ========== 首頁：主題選擇 ========== -->
+  <section class="view on" id="v-home">
+    <div class="head">
+      <div class="kick">親子共學教具</div>
+      <h1>親子演算法對話卡</h1>
+      <p>抽一張，和孩子聊一件事。</p>
+    </div>
+    <div class="cats" id="cats"></div>
+    <div class="tip">點選主題，開始抽卡。</div>
+    <button class="allbtn" id="allBtn" type="button">☰ 全部展開　瀏覽全部 33 張</button>
+  </section>
+
+  <!-- ========== 主題頁：抽卡／列表 ========== -->
+  <section class="view" id="v-deck">
+    <div class="bar2">
+      <button class="back-btn" id="toHome">← 主題</button>
+      <div class="ti"><div class="n" id="dName"></div><div class="c" id="dCount"></div></div>
+      <div class="sp"></div>
+    </div>
+    <div class="seg" id="seg">
+      <button data-m="draw" aria-pressed="true">🂠 抽卡</button>
+      <button data-m="list" aria-pressed="false">☰ 列表</button>
+    </div>
+    <div class="stage" id="stage"></div>
+    <div id="seenBox"></div>
+  </section>
+
+  <!-- ========== 全部展開 ========== -->
+  <section class="view" id="v-all">
+    <div class="bar2">
+      <button class="back-btn" id="allBack">← 主題</button>
+      <div class="ti"><div class="n">全部卡片</div><div class="c" id="allCount"></div></div>
+      <div class="sp"></div>
+    </div>
+    <div id="allBody"></div>
+  </section>
+
+  <div class="foot">
+    本教具部分改編自美國兒科學會卓越中心之家庭社群媒體對話素材，其餘卡片由自行編寫；
+    演算法改寫內容為自行編寫。
+  </div>
+</div>
+
+<script>
+/* ===== 卡片資料（沿用 親子演算法對話卡_原型v1.html 之 CARDS，內容未更動） ===== */
+const CARDS = [
+ {
+  "id": "G1",
+  "cat": "綠 Green",
+  "tzh": "設立無手機時段／空間",
+  "zh": "提示：全家一起設立「無科技」的時段或空間。對你們家來說可能是什麼樣子？\n\n「一天當中有沒有哪些時段或場合，我們可以都不用手機，留點時間全家一起相處？也許是吃飯時，或坐車時？」\n\n「我們各自列出最常滑手機、最該收起來的前三個場合。我的前三名是……」",
+  "algo": "提示：全家設立「無演算法時段」——收手機，也一起聊為什麼有些 App 讓人停不下來。 「你有沒有發現，有些 App（例如短影音）滑起來特別停不下來？我們一起找出家裡最容易被『一直往下滑、自動播下一個』綁住的時段，把它設成無手機時間好嗎？」 「我們各自猜猜看：是誰設計讓影片一支接一支自動播的？（是演算法喔）我們來比賽誰先放下手機。」",
+  "lvl": "中"
+ },
+ {
+  "id": "G2",
+  "cat": "綠 Green",
+  "tzh": "以身作則的螢幕使用",
+  "zh": "提示：家長用很多科技，孩子通常也會。家長的示範與界線很重要。\n\n「有沒有什麼時候，你希望我多陪你、而不是一直看手機？」\n\n「晚上大家都在家時，你覺得我用手機的習慣如何？週末呢？」\n\n「我可以怎麼做，才能示範更健康的科技使用？」",
+  "algo": "提示：家長不只示範「少滑」，也示範「主動管理自己的推薦內容」。 「我最近在整理自己的推薦內容——把不想看的按『不感興趣』、多追蹤不同主題。你要不要看我怎麼做，我們一起把彼此的首頁『重新訓練』一遍？」 「你覺得我的首頁都被推些什麼？如果我一直看某類影片，演算法就會一直推更多——我示範給你看。」",
+  "lvl": "中"
+ },
+ {
+  "id": "G3",
+  "cat": "綠 Green",
+  "tzh": "社群情緒檢查",
+  "zh": "提示：在孩子用完社群後關心一下——他覺得變好還是變糟？留意情緒反應能幫他做更有意識的選擇。\n\n「你有沒有想過，用完最愛的社群 App 之後，當下心情如何？試試看——是變好還是變差？為什麼會這樣？」\n\n「上次你不小心把手機忘在家，那種感覺如何？為什麼？」",
+  "algo": "提示：帶孩子留意——演算法為了衝互動，常推情緒化、聳動的內容，用完是否被帶著心情起伏？ 「你發現了嗎？讓你越看越氣、越看越比較的影片，往往被推得最多——因為那樣你會一直看。用完之後你心情如何？」 「我們一起做個小實驗：連續看三支推薦影片，記下每支看完的心情，看看演算法都推你哪一種？」",
+  "lvl": "高"
+ },
+ {
+  "id": "G4",
+  "cat": "綠 Green",
+  "tzh": "我們為什麼一直滑：看懂社群習慣",
+  "zh": "提示：和孩子一起花點時間回想他（和你）的社群習慣——注意什麼時候最難登出、什麼方法能幫你抽離。看懂模式，就更容易設下健康界線。\n\n「你有沒有注意到，什麼時候特別難離開社群？什麼方法能幫你停下來？」\n\n「用社群到現在，有什麼事讓你覺得意外？」\n\n「你覺得一直滑，帶給你的好處是什麼？」",
+  "algo": "提示：帶孩子看懂『為什麼停不下來』背後的演算法設計——不是你不自律，是它被設計成讓你一直滑。 「你覺得是誰決定你首頁下一支影片？（演算法）它靠自動播放、無限捲動讓你停不下來。什麼方法幫你按下停止？」 「我們一起找找看：TikTok/YouTube 裡有沒有『提醒休息』或『設定時間』的功能？找到就一起打開。」",
+  "lvl": "高"
+ },
+ {
+  "id": "G5",
+  "cat": "綠 Green",
+  "tzh": "跟螢幕說晚安",
+  "zh": "提示：幫孩子設睡前界線，別讓螢幕妨礙好眠。手機晚上可以「睡」在哪裡，才不會伸手就拿得到？\n\n「睡眠對每個人都很重要——幫我們專心、穩定情緒、有精神做喜歡的事。我們來聊聊怎麼睡得更好。」\n\n「我想聊聊晚上手機放哪。該收在哪裡？怎麼確定它不會吵到睡覺？」",
+  "algo": "提示：設睡前界線之外，也一起關掉『把你留在線上』的演算法通知與自動播放。 「睡前手機一直跳通知、影片自動播下一支，會讓人捨不得睡。我們一起把睡前的推播通知和自動播放關掉，好嗎？」 「手機晚上『睡』在客廳充電區。我們也順手打開『勿擾模式』，讓演算法晚上別再找你。」",
+  "lvl": "中"
+ },
+ {
+  "id": "G6",
+  "cat": "綠 Green",
+  "tzh": "當螢幕擠掉了你的生活",
+  "zh": "提示：沒有一體適用的螢幕時間標準，但很多人都覺得自己用得比想要的多。當螢幕佔太多時間，它擠掉了哪些活動？\n\n「你有沒有看過自己在某些 App 或某類內容上花多少時間？花在喜歡的內容 vs. 隨便亂看的內容各多少？」\n\n「你會不會設定『專注模式』和『勿擾』，替其他活動保留時間？」",
+  "algo": "提示：一起檢視螢幕時間，並分辨『我主動想看的』與『演算法塞給我、隨手亂看的』差別。 「我們一起看手機的使用時間報告：多少時間是你真的想看的，多少是演算法一直推、你就順著滑掉的？」 「找到『被亂看擠掉』的活動後，我們設專注模式保護它——也順手把那類不想要的內容按『不感興趣』。」",
+  "lvl": "高"
+ },
+ {
+  "id": "Y1",
+  "cat": "黃 Yellow",
+  "tzh": "辨識危險訊號",
+  "zh": "提示：聊聊社群和私訊什麼時候「怪怪的」。線上危險訊號包括：不認識的人傳訊息、要求見面或索取個人資料。\n\n「有沒有不認識的人想聯絡你？你怎麼決定要怎麼做？」\n\n「你都怎麼辨識線上的危險訊號？」\n\n「如果有人讓你不舒服，你知道怎麼封鎖嗎？我們一起研究看看？」",
+  "algo": "提示：也聊聊——演算法的『好友／追蹤建議』可能把孩子連到陌生成人，不是你去找，是它推給你。 「有沒有發現，App 會『推薦你可能認識的人』或一直推陌生帳號給你？這些是演算法算出來的。收到不認識的人時你怎麼判斷？」 「我們一起看：怎麼關掉『把我推薦給陌生人』、怎麼封鎖讓你不舒服的帳號。」",
+  "lvl": "中"
+ },
+ {
+  "id": "Y2",
+  "cat": "黃 Yellow",
+  "tzh": "懂得何時該保護隱私",
+  "zh": "提示：和孩子談為什麼要保護線上個資。一起檢查社群設定，確認隱私功能有開。\n\n「用社群有件很重要的事，就是保護隱私。你看過自己帳號的隱私設定嗎？設成公開的帳號，真的需要公開嗎？」\n\n「哪些關於你的資訊你願意在網路上分享？哪些不願意？我先說……」",
+  "algo": "提示：也讓孩子知道——你分享的資料（喜好、年齡、位置）正是演算法用來『貼標籤、推廣告』的原料。 「你有沒有想過，App 為什麼那麼會猜你喜歡什麼？因為它蒐集你按讚、搜尋、停留的資料。我們一起看隱私設定，少給它一點資料。」 「哪些資訊你願意讓演算法知道、哪些不願意？我們一起關掉不必要的資料蒐集。」",
+  "lvl": "中"
+ },
+ {
+  "id": "Y3",
+  "cat": "黃 Yellow",
+  "tzh": "它把誰推到你面前？",
+  "zh": "（本卡為自行編寫，無對應之 AAP 原卡。）",
+  "algo": "提示：被推薦的不只有內容，還有「人」。好友建議、你可能認識的人、直播間裡冒出來的陌生帳號，都是系統算出來的。\n\n「你有沒有收過不認識的人的訊息或好友邀請？你怎麼決定要不要理他？」\n\n「我們一起看設定：怎麼關掉『把我推薦給別人』、怎麼封鎖。遇到要加陌生人，先停一下、找我。」",
+  "lvl": "高"
+ },
+ {
+  "id": "Y4",
+  "cat": "黃 Yellow",
+  "tzh": "分享前想一想",
+  "zh": "提示：和孩子談線上的個人界線——什麼可以分享、以及貼照片前尊重別人隱私的重要。\n\n「你怎麼決定關於自己或別人的什麼可以貼、可以分享？」\n\n「如果有人沒問過你就貼你的照片，你會怎麼想？」\n\n「關於我在自己社群上怎麼分享你的事，有沒有什麼你想讓我知道的？」",
+  "algo": "提示：分享界線之外，也讓孩子知道——貼出去的內容會被演算法推給你想不到的人、還可能被拿去訓練系統。 「你貼的東西不只給朋友看，演算法可能推給陌生人。貼之前想想：這如果被不認識的人看到，我 OK 嗎？」 「別人的照片也一樣——沒問過就貼，等於幫演算法散播他的資料。」",
+  "lvl": "中"
+ },
+ {
+  "id": "Y5",
+  "cat": "黃 Yellow",
+  "tzh": "面對不舒服的內容",
+  "zh": "提示：從很小開始，孩子就可能在 YouTube、Roblox 等看到令人不安的畫面。暴力、詭異或性的影像特別吸睛、也容易擴散。談談會遇到什麼、以及可以怎麼做。\n\n「在網路上看到詭異、讓人不舒服、或你不想看的內容，其實很常見。你有沒有遇過？」\n\n「有時候我會被推播跟【某某】有關的內容。你有沒有建議，我可以怎麼改變我看到的內容？」",
+  "algo": "提示：帶孩子理解——這類內容不是你倒楣才看到，是因為它『抓注意力→演算法就一直推』；然後一起動手『重新訓練/重置』推薦。 「詭異、嚇人的影片為什麼一直出現？因為它讓人一直看，演算法就一直推。我們一起把它按『不感興趣』，讓它少推。」 「如果 YouTube 一直推嚇人的影片，我們一起去設定裡『重置推薦』、清觀看紀錄，重新訓練它。（單元三 重置行動包）」",
+  "lvl": "高"
+ },
+ {
+  "id": "Y6",
+  "cat": "黃 Yellow",
+  "tzh": "封鎖還是不封鎖",
+  "zh": "提示：多數社群平台允許封鎖或檢舉他人。讓孩子習慣：看到冒犯內容要檢舉、遇到讓你不舒服的人要封鎖，這都是正常且重要的。\n\n「你在【某平台】上，怎麼分辨誰友善、誰不友善？你怎麼決定要封鎖誰？」\n\n「你知道怎麼封鎖或取消追蹤嗎？我們一起研究看看？」",
+  "algo": "提示：封鎖／檢舉／取消追蹤不只保護自己，也是在『給演算法新訊號』——告訴它你不想看什麼。 「你每次按封鎖、檢舉、取消追蹤，其實也在教演算法『別再推這種』。我們一起練習用這些按鈕。」 「我們一起把讓你不舒服的帳號封鎖，再多追蹤幾個你真正喜歡的正向帳號，重新訓練你的首頁。」",
+  "lvl": "中"
+ },
+ {
+  "id": "Y7",
+  "cat": "黃 Yellow",
+  "tzh": "越吵越紅：它為什麼推激動的內容",
+  "zh": "（本卡為自行編寫，無對應之 AAP 原卡。）",
+  "algo": "提示：讓人生氣、驚訝、想吵架的內容互動最高，所以被推得最多。發現自己越滑越激動時，先想一下：是這件事真的很嚴重，還是它被推到我面前？\n\n「你最近有沒有看到什麼讓你很氣或覺得很誇張的影片？那支後面，是不是又推了好幾支類似的？」\n\n「我們一起試：對那一類按『不感興趣』，看接下來幾天推的東西會不會變。」",
+  "lvl": "高"
+ },
+ {
+  "id": "Y8",
+  "cat": "黃 Yellow",
+  "tzh": "我來抓假訊息",
+  "zh": "提示：網路上的錯假訊息越來越多。用這些方法辨識：帶批判的眼光看；注意錯字或雜亂內容；留意誇大事實、讓你情緒激動的資訊；查來源、看看別的網站有沒有一樣的說法。\n\n「你有沒有注意到貼文裡有『標題殺人』、誇大主張、或沒附來源的情況？看到時你通常會怎麼做？」",
+  "algo": "提示：帶孩子理解——越聳動、越讓你激動的內容，演算法越愛推（因為你會一直看、一直分享），所以假訊息更容易被放大。 「有沒有發現，越誇張、越讓你生氣的貼文越常出現？因為那樣大家會一直點、一直轉，演算法就一直推。看到時我們先停一下、查來源。」 「我們一起玩『抓假訊息』：找一則你首頁的聳動貼文，一起查它是真是假、來源可不可信。（批判判讀）」",
+  "lvl": "高"
+ },
+ {
+  "id": "R1",
+  "cat": "紅 Red",
+  "tzh": "你的真實年齡是？",
+  "zh": "提示：許多社群平台為青少年提供更好的保護設定，包括隱私設定與過濾強烈內容的功能。\n\n「App 註冊時問你年齡，你通常怎麼填？」\n\n「App 的年齡限制是為了保護你，避免看到不適合年紀的內容或遇到怪人。你知道嗎——用真實年齡，常會有專為青少年設計、體驗更好的功能。」",
+  "algo": "提示：填真實年齡，演算法才會用『適齡』的規則推內容給孩子；謊報年齡會讓保護失效。 「填真實年齡很重要——這樣 App 的演算法才會用適合你年紀的設定，少推不適合的內容。我們一起看你的帳號填的年齡對不對。」 「很多平台建議滿 13 歲再用。我們一起看，用真實年齡會多開哪些青少年保護功能。」",
+  "lvl": "中"
+ },
+ {
+  "id": "R2",
+  "cat": "紅 Red",
+  "tzh": "看懂演算法（上）：養出正向內容",
+  "zh": "提示：社群平台會追蹤你的搜尋、觀看與分享，演算法接著推薦類似內容到你的首頁。多與讓你開心、受啟發、學到新東西的內容互動，演算法就會慢慢改變、多推你喜歡的。\n\n「你在 Instagram 或 TikTok 上，覺得演算法推得如何？」\n\n「多數 App 都能調設定、突顯你偏好的內容。我們一起看 TikTok 的『內容偏好』，把喜歡的主題排出來。」",
+  "algo": "提示（幾乎可直接用，對象改國小、改成親子一起做）：一起理解『你餵什麼、它推什麼』，並動手把首頁養成正向的。 「演算法會記錄你看什麼、按什麼讚，然後一直推類似的。我們一起試：多看、多互動正向的內容，看首頁會不會慢慢變好。」 「我們一起打開 TikTok/IG 的『內容偏好』，把喜歡的主題排出來，主動教演算法推好東西。（親子共學實驗 親子共學任務）」",
+  "lvl": "高"
+ },
+ {
+  "id": "R3",
+  "cat": "紅 Red",
+  "tzh": "看懂演算法（下）：清掉負面內容",
+  "zh": "提示：青少年和大人都能用 App 內建設定，減少或清掉負面、不想要的內容。設定因 App 而異，常見的有：主題排序、選『不感興趣』、加入要避開的關鍵字或主題。\n\n「你會不會看到不想看的內容？我們一起看怎麼重置演算法，找我們喜歡的內容。」\n\n「你說 YouTube 一直推恐怖影片。我們一起看怎麼選『不感興趣』，讓它別再自動播放。」",
+  "algo": "提示（可直接用，對象改國小、改成親子一起做）：一起動手『重置＋不感興趣』，把不想要的內容清掉。這就是 單元三 演算法重置行動包。 「看到不想要的內容，我們一起做：按『不感興趣』、清觀看紀錄、用『重置推薦』重新開始。」 「我們照步驟做一次：TikTok 刷新『為你推薦』／IG『重置建議內容』／YouTube 關閉觀看紀錄。（單元三 逐步操作）」",
+  "lvl": "高"
+ },
+ {
+  "id": "R4",
+  "cat": "紅 Red",
+  "tzh": "設計你自己的平台",
+  "zh": "提示：多數社群平台是為大人、不是為青少年設計的。年輕人有什麼獨特之處？社群可以怎麼做得更適合他們？\n\n「你希望【你的手機／最愛的社群平台】哪裡設計得更好？你會改什麼？」\n\n「有這個帳號，你喜歡的地方是什麼？缺點呢？有沒有想改的？為什麼？」",
+  "algo": "提示：帶孩子跳出來想——如果換你設計演算法，你會讓它推什麼、不推什麼？這是在練習『倫理判斷』。 「假設你是設計師，你會怎麼設計演算法？它該不該一直推讓人停不下來的東西？該不該蒐集小朋友的資料？」 「你覺得現在的演算法對小朋友公平嗎？哪裡你想改？為什麼？（討論公平、資料、被誰決定）」",
+  "lvl": "中"
+ },
+ {
+  "id": "R5",
+  "cat": "紅 Red",
+  "tzh": "遊戲為什麼一直推你儲值",
+  "zh": "提示：青少年常很難從線上遊戲抽身。和愛打電動的孩子聊聊，理解背後原因。\n\n「每次我叫你別打了、【來吃飯／睡覺／寫作業／做家事】，你好像會不高興。那些時候你心裡在想什麼？」\n\n「什麼原因讓你很難停下來？有沒有哪些遊戲特別難停？有沒有想跟我一起玩的遊戲？」",
+  "algo": "提示（本方案主案例）：遊戲裡的推薦與商店頁，會挑「你正投入、快過關、剛失敗」的時候出現。那不是巧合，是算好的時機。\n\n「你有沒有注意過，跳出『首儲雙倍、限時 30 分鐘』的時候，你正在做什麼？它為什麼挑那個時候？」\n\n「我們一起看這個遊戲的商店頁：哪些設計是想讓你多玩一下？哪些是想讓你掏錢？」",
+  "lvl": "高"
+ },
+ {
+  "id": "R6",
+  "cat": "紅 Red",
+  "tzh": "又是廣告！",
+  "zh": "提示：公司常利用它們知道的你——喜好、年齡、位置、朋友、線上行為——來靠廣告賺錢，於是你會看到大量個人化廣告。\n\n「你覺得【某平台】對你了解多少？你對這件事有什麼感覺？」\n\n「你知道怎麼把不想看的廣告關掉嗎？有些平台可以讓你選、關掉不想要的廣告。我們一起看 TikTok 上能怎麼做。」",
+  "algo": "提示：平台用你的喜好、年齡、位置、看過什麼，決定推哪些廣告。同一套機制換個商品照樣運作——今天推遊戲禮包，明天推零食與手搖飲，也可能推菸酒。\n\n「你覺得這個 App 對你了解多少？它為什麼知道你想要什麼？」\n\n「我們一起找找：這一頁哪幾則其實是廣告？再一起看廣告設定，能不能少看一點。」",
+  "lvl": "高"
+ },
+ {
+  "id": "B1",
+  "cat": "藍 Blue",
+  "tzh": "同學都在看，所以我也要看",
+  "zh": "（本卡為自行編寫，無對應之 AAP 原卡。）",
+  "algo": "提示：孩子看什麼，不只被演算法決定，也被同學決定。同學傳一支過來，他點進去看完，演算法就當成「他喜歡」，接著一直推。\n\n「最近班上在瘋什麼？是誰先看到的？你點進去之後，是不是就一直出現？」\n\n「如果那其實不是你想看的，我們一起處理掉——不感興趣、取消追蹤，教它別再推。」",
+  "lvl": "高"
+ },
+ {
+  "id": "B2",
+  "cat": "藍 Blue",
+  "tzh": "社群近況小聊",
+  "zh": "提示：用開放式問題，真心關心孩子的線上世界。不帶批判地聆聽，能建立信任、讓溝通保持暢通。\n\n「今天載你和朋友時，聽到你們在聊社群上看到的事。社群在那件事裡，是幫上忙還是幫倒忙？」\n\n「社群是和朋友聯繫的好地方。你有沒有只在線上認識的朋友？你們怎麼認識的？」",
+  "algo": "提示：把『開放式關心』延伸到演算法——問孩子最近首頁都被推什麼，不帶批判地一起看。這就是主動中介。 「最近你的首頁都推你什麼呀？有沒有讓你覺得有趣、或怪怪的？講給我聽，我很好奇。」 「我們一起滑一下你的推薦，你當我的導覽員，告訴我這些是怎麼跑出來的。（不批判、建立信任）」",
+  "lvl": "高"
+ },
+ {
+  "id": "B3",
+  "cat": "藍 Blue",
+  "tzh": "把被擠掉的活動找回來",
+  "zh": "提示：幫孩子建立作息，把因忙碌與滑手機而被擠掉的活動找回來。\n\n「我注意到你花在【某活動】的時間變少、滑手機變多。滑到忘記時間，跟做其他喜歡的活動，感覺有什麼不一樣？」\n\n「你有沒有看過身邊的大人也『滑到忘我』？那讓你有什麼感覺？」\n\n「這週末我們全家一起做什麼活動好？」",
+  "algo": "提示：推薦頁永遠有下一支，所以它不會提醒你「該做別的事了」。被擠掉的活動，要自己排回去。\n\n「這個月你比較少做哪件本來很喜歡的事？是時間不夠，還是滑一滑就過去了？」\n\n「我們一起排：這週留兩個時段給那件事，時間到手機先放客廳。也順手把提醒休息的功能打開。」",
+  "lvl": "中"
+ },
+ {
+  "id": "B4",
+  "cat": "藍 Blue",
+  "tzh": "面對面 vs. 線上",
+  "zh": "提示：在網路上表達自己有時比面對面容易，但這也讓人難以判斷某件事或某個人是不是真的。看到覺得怪怪的、或像是被修改過的東西，先停一下，想想為什麼。\n\n「你覺得社群上的人真實嗎？你怎麼判斷他們是不是真的？」\n\n「有沒有哪些時候，你在網路上發文比現實中分享更自在？為什麼？」",
+  "algo": "提示：延伸到『看到怪怪的內容先暫停』——現在有 AI 換臉、AI 網紅、假帳號，演算法也會推這些。教孩子停下來、查證。 「現在有 AI 做的假影片、換臉、假網紅，看起來很真。看到怪怪、太完美的內容，我們先暫停想一下：這是真的嗎？」 「我們一起看一則你首頁的內容，練習判斷它是真人、還是 AI 或修過的。（批判判讀）」",
+  "lvl": "中"
+ },
+ {
+  "id": "B5",
+  "cat": "藍 Blue",
+  "tzh": "一小時就不見了",
+  "zh": "（本卡為自行編寫，無對應之 AAP 原卡。）",
+  "algo": "提示：自動播放、無限捲動、每一支都剛好對胃口——這些是設計出來讓人停不下來的，不完全是自制力的問題。\n\n「你有沒有本來只想看一下，結果一小時就過去了？當時是什麼讓你停不下來？」\n\n「我們一起找找：這個 App 有沒有『提醒休息』或『關閉自動播放』？一起打開看看。」",
+  "lvl": "高"
+ },
+ {
+  "id": "P1",
+  "cat": "彩虹 Rainbow",
+  "tzh": "幾歲可以用社群",
+  "zh": "提示：學齡前後的孩子會開始要求申辦 Instagram、Snapchat、TikTok 等帳號。研究建議至少等到 13 歲，以降低負面心理健康風險。即使滿 13 歲，也不是每個孩子都準備好了。\n\n「你孩子有哪些特質或困難，會讓『有社群帳號』這件事比較容易或比較難？」\n\n「你覺得開始用社群前，最重要該具備哪些能力？」",
+  "algo": "提示（對國小家長特別相關）：把『幾歲用』連到『演算法對年幼孩子風險更大』，並強調開始用之前先具備演算法素養。 「小朋友越早用，越容易被演算法一直餵不適合的內容。開始用之前，我們先一起學會怎麼看懂、怎麼重置演算法。」 「你覺得用社群前，該先會哪些『看懂演算法』的本事？我們一起列出來。」",
+  "lvl": "中"
+ },
+ {
+  "id": "P2",
+  "cat": "彩虹 Rainbow",
+  "tzh": "把手機設定調好",
+  "zh": "提示：透過管理手機設定，掌控孩子（和你自己！）在什麼時候、收到哪些通知。可參考 AAP 的數位媒體平台詞彙表，認識不同 App 與可用設定。\n\n「你有沒有設定手機的『勿擾』或『專注』模式？我們一起走一遍設定。」\n\n「有哪些設定我們想以家庭為單位一起約定，例如定位追蹤或群組訊息？」",
+  "algo": "提示：把『調設定』延伸為家庭一起做的『演算法與通知健檢』，並可作為家庭數位公約的一部分。 「我們一起做『手機健檢』：關掉不必要的通知、打開專注模式、順手把首頁的『不感興趣』設一設。」 「這些設定我們寫進家庭數位公約，全家一起遵守。（家庭媒體規則 單元五）」",
+  "lvl": "中"
+ },
+ {
+  "id": "P3",
+  "cat": "彩虹 Rainbow",
+  "tzh": "Instagram",
+  "zh": "「你喜歡這個 App 哪裡？你大部分的朋友都怎麼用 Instagram？」\n\n設定與須知：\n• 未滿 16 歲的新用戶會有「青少年帳號（Teen Account）」，內建預設安全設定。\n• 若不喜歡看到的內容和廣告、想徹底換掉，可在設定中「重置建議內容（Reset Suggested Content）」。\n• 若不想完全重置，可對想少看的貼文選「不感興趣（Not Interested）」來影響演算法。",
+  "algo": "提示（平台卡＝單元三 重置行動包實作）：親子一起實際操作 IG 的重置與『不感興趣』。 「我們一起打開 IG：個人檔案 → 選單 → 內容偏好 → 重置建議內容 → 重置。看看首頁會不會變。」 「對不想看的貼文，我們一起按『不感興趣』，教演算法少推。」",
+  "lvl": "高"
+ },
+ {
+  "id": "P4",
+  "cat": "彩虹 Rainbow",
+  "tzh": "TikTok",
+  "zh": "「你怎麼知道該停止滑了？有時會看到讓你不舒服的影片嗎？」\n\n設定與須知：\n• 家長／監護人可用「家庭安全配對（Family Pairing）」連結孩子帳號，限制內容、設螢幕時間、改通知設定。\n• 未滿 18 歲帳號預設為私人。\n• 若覺得推薦不再相關，可「刷新『為你推薦』」，依新的互動重新給內容。",
+  "algo": "提示（平台卡＝單元三 重置行動包實作）：親子一起用家庭配對＋刷新『為你推薦』。 「我們一起設 TikTok『家庭配對』，也一起把『為你推薦』刷新一次，重新訓練它。」 「看到不舒服的影片，我們一起長按選『不感興趣』。」",
+  "lvl": "高"
+ },
+ {
+  "id": "P5",
+  "cat": "彩虹 Rainbow",
+  "tzh": "Roblox",
+  "zh": "（本卡為自行編寫，無對應之 AAP 原卡。）",
+  "algo": "提示（台灣國小常用）：Roblox 裡的遊戲是其他玩家做的，首頁會依孩子玩過什麼推薦新遊戲；遊戲內另有 Robux 的消費設計。\n\n「你最近在玩哪幾個？首頁推給你的，跟你原本想玩的一樣嗎？」\n\n設定與須知：\n・可設定家長 PIN 碼，限制可玩內容與消費。\n・帳號年齡設定會影響聊天與內容過濾，填真實年齡保護才會啟動。\n・Robux 消費一起確認；遇到要花錢，先停一下、找爸媽。\n\n※ 平台功能會改版，操作前請一起查證最新設定。",
+  "lvl": "高"
+ },
+ {
+  "id": "P6",
+  "cat": "彩虹 Rainbow",
+  "tzh": "YouTube",
+  "zh": "「你最喜歡 YouTube 哪裡？看喜歡的內容時，演算法有沒有推過完全不相干的影片給你？」\n\n設定與須知：\n• 不用帳號也能看 YouTube 影片。\n• 不像電視或電影，YouTube 的內容不需經過審查或分級。\n• 為 13–17 歲青少年建私人帳號，會加上安全防護、減少部分不當內容。\n• 未滿 17 歲預設關閉自動播放；未滿 13 歲可由家長選內容設定。",
+  "algo": "提示（平台卡＝單元三 重置行動包實作）：原卡已直接問『演算法推不相干影片』，親子一起關自動播放＋清觀看紀錄。 「你發現了嗎——看著看著就被推到完全不相干的影片。我們一起關掉自動播放，也去 myactivity.google.com 關閉/清除觀看紀錄，重新訓練它。」",
+  "lvl": "高"
+ },
+ {
+  "id": "P7",
+  "cat": "彩虹 Rainbow",
+  "tzh": "手機遊戲的家長設定",
+  "zh": "（本卡為自行編寫，無對應之 AAP 原卡。）",
+  "algo": "提示：遊戲的「推薦」和「消費」是兩件事，兩邊都可以設。商店的家長控制能擋掉未經同意的付款；遊戲內的推薦則要靠互動去訓練。\n\n「我們一起看：這支遊戲有哪些地方會跳出要你買東西的畫面？」\n\n設定與須知：\n・iOS「螢幕使用時間」／Android「Google Play 家長設定」可設定每次購買都需密碼。\n・關閉遊戲的推播通知，減少「快回來」的提醒。\n・和孩子約好：任何要花錢的畫面，先停下來、找爸媽。\n\n※ 系統與遊戲設定會改版，請一起查證最新版本。",
+  "lvl": "高"
+ },
+ {
+  "id": "P8",
+  "cat": "彩虹 Rainbow",
+  "tzh": "短影音（Shorts／Reels／抖音）",
+  "zh": "（本卡為自行編寫，無對應之 AAP 原卡。）",
+  "algo": "提示：短影音的推薦最快也最強——看完一支就算一次訊號，幾分鐘就能把首頁帶往一個方向，也最容易把人帶去別的平台繼續搜尋。\n\n「你最近在短影音上看到什麼？看完之後，有沒有再去別的地方搜尋那件事？」\n\n設定與須知：\n・對不想看的長按選「不感興趣」，比直接滑過去有效。\n・可刷新／重置推薦，重新開始訓練首頁。\n・和孩子約好：看到讓人不舒服的內容，先告訴爸媽，不要自己一直往下查。\n\n※ 平台功能會改版，操作前請一起查證最新設定。",
+  "lvl": "高"
+ }
+];
+
+const CATS = [
+  {key:'綠 Green',     short:'綠',  label:'界線與習慣', color:'#6E9E77', ink:'#4A7A52', tint:'#E8F1E9'},
+  {key:'黃 Yellow',    short:'黃',  label:'安全技能',   color:'#E0A63F', ink:'#93691A', tint:'#FBF0DA'},
+  {key:'紅 Red',       short:'紅',  label:'科技設定',   color:'#C2604C', ink:'#9B4433', tint:'#F9E7E2'},
+  {key:'藍 Blue',      short:'藍',  label:'社交連結',   color:'#5B7FA3', ink:'#3F6183', tint:'#E6EDF4'},
+  {key:'彩虹 Rainbow', short:'彩虹',label:'平臺設定',
+   color:'linear-gradient(90deg,#C2604C,#E0A63F,#6E9E77,#5B7FA3,#8792C0)', ink:'#7A6B9E', tint:'#F0EDF6'}
+];
+const catOf = k => CATS.find(c=>c.key===k);
+const byId  = id => CARDS.find(c=>c.id===id);
+const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ===== 狀態 ===== */
+let S = {cat:null, order:[], pos:0, seen:[], active:null, review:false,
+         mode:'draw', ctx:'deck', wide:false};
+function save(){ try{ sessionStorage.setItem('drawdeck2', JSON.stringify(S)); }catch(e){} }
+function load(){ try{ const d=JSON.parse(sessionStorage.getItem('drawdeck2')||'null'); if(d) S=Object.assign(S,d); }catch(e){} }
+function shuffled(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+/* ===== 桌機／手機比例 ===== */
+const vt=document.getElementById('vt');
+function applyFrame(){
+  const wide=window.matchMedia('(min-width:900px)').matches;
+  document.body.classList.toggle('framed', wide && !S.wide);
+  document.body.classList.toggle('wide',   wide &&  S.wide);
+  vt.textContent = S.wide ? '📱 手機檢視' : '🖥 寬版閱讀';
+}
+vt.onclick=()=>{ S.wide=!S.wide; save(); applyFrame(); };
+window.addEventListener('resize', applyFrame);
+
+/* ===== 首頁 ===== */
+function renderHome(){
+  const box=document.getElementById('cats'); box.innerHTML='';
+  CATS.forEach(c=>{
+    const n=CARDS.filter(x=>x.cat===c.key).length;
+    const b=document.createElement('button'); b.className='cat'; b.type='button';
+    b.innerHTML='<span class="edge" style="background:'+c.color+'"></span>'+
+      '<span class="body"><span class="nm">'+esc(c.label)+'</span>'+
+      '<span class="sub">'+esc(c.short)+'　'+esc(c.key.split(' ')[1])+'</span></span>'+
+      '<span class="cnt"><b>'+n+'</b><span>張</span></span>';
+    b.onclick=()=>openCat(c.key);
+    box.appendChild(b);
+  });
+}
+function show(id){
+  ['v-home','v-deck','v-all'].forEach(v=>{
+    document.getElementById(v).classList.toggle('on', v===id);
+  });
+  window.scrollTo(0,0);
+  const app=document.querySelector('.app'); if(app) app.scrollTop=0;
+}
+function toHome(){ S.cat=null; S.active=null; S.ctx='deck'; save(); show('v-home'); }
+document.getElementById('toHome').onclick=toHome;
+document.getElementById('allBack').onclick=toHome;
+
+/* ===== 進入主題 ===== */
+function openCat(key){
+  S.cat=key;
+  S.order=shuffled(CARDS.filter(c=>c.cat===key).map(c=>c.id));
+  S.pos=0; S.seen=[]; S.active=null; S.review=false; S.ctx='deck';
+  save(); show('v-deck'); syncSeg(); renderDeck(S.mode==='draw');
+}
+function syncSeg(){
+  Array.prototype.forEach.call(document.getElementById('seg').children,b=>{
+    b.setAttribute('aria-pressed', b.dataset.m===S.mode);
+  });
+}
+document.getElementById('seg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  S.mode=b.dataset.m; S.active=null; S.review=false; save(); syncSeg();
+  renderDeck(S.mode==='draw');
+});
+
+/* ===== 主題頁 ===== */
+function stackT(i,n){
+  const d=n-1-i;
+  return 'translate('+(d*1.7)+'px,'+(d*2.5)+'px) rotate('+((d%2?-1:1)*d*0.7)+'deg)';
+}
+function renderDeck(autoShuffle){
+  const c=catOf(S.cat), M=S.order.length;
+  document.getElementById('dName').textContent=c.label;
+  document.getElementById('dCount').textContent='已抽 '+S.pos+' / 共 '+M;
+  const stage=document.getElementById('stage'); stage.innerHTML='';
+  document.getElementById('seg').style.display = S.active ? 'none' : '';
+
+  if(S.active){ stage.appendChild(buildCard(byId(S.active))); renderSeen(false); return; }
+
+  /* --- 列表模式 --- */
+  if(S.mode==='list'){
+    stage.style.justifyContent='flex-start';
+    const wrap=document.createElement('div'); wrap.className='list';
+    S.order.forEach((id,i)=>{
+      wrap.appendChild(listRow(byId(id), i<S.pos));
+    });
+    stage.appendChild(wrap); renderSeen(true); return;
+  }
+  stage.style.justifyContent='center';
+
+  /* --- 抽完 --- */
+  if(S.pos>=M){
+    const f=document.createElement('div'); f.className='fin';
+    f.innerHTML='<div class="ic">🎉</div><h3>這個主題聊完了</h3>'+
+      '<p>「'+esc(c.label)+'」的 '+M+' 張都抽過了。</p>'+
+      '<div class="btns"><button class="pri" id="again">重新洗牌再來一輪</button>'+
+      '<button id="other">換一個主題</button></div>';
+    stage.appendChild(f);
+    f.querySelector('#again').onclick=()=>openCat(S.cat);
+    f.querySelector('#other').onclick=toHome;
+    renderSeen(true); return;
+  }
+
+  /* --- 牌疊 --- */
+  const wrap=document.createElement('div'); wrap.className='deckwrap';
+  const deck=document.createElement('div'); deck.className='deck'; deck.id='deck';
+  const remain=M-S.pos, vis=Math.min(remain,7);
+  for(let i=0;i<vis;i++){
+    const b=document.createElement('div'); b.className='back';
+    b.style.transform=stackT(i,vis); b.style.zIndex=String(i);
+    if(i===vis-1) b.innerHTML='<div class="mono">演</div><div class="cap">親子演算法對話卡</div>';
+    deck.appendChild(b);
+  }
+  deck.onclick=drawCard; wrap.appendChild(deck);
+  const hint=document.createElement('div'); hint.className='deckhint';
+  hint.innerHTML='點一下牌疊抽卡　·　還有 <b>'+remain+'</b> 張';
+  wrap.appendChild(hint);
+  const sh=document.createElement('button'); sh.className='mini-btn'; sh.type='button';
+  sh.textContent='↺ 重新洗牌';
+  sh.onclick=e=>{ e.stopPropagation(); reshuffle(); };
+  wrap.appendChild(sh);
+  stage.appendChild(wrap);
+  renderSeen(true);
+  if(autoShuffle) setTimeout(doShuffle,60);
+}
+
+function listRow(card, drawn){
+  const c=catOf(card.cat);
+  const b=document.createElement('button'); b.className='li'; b.type='button';
+  b.innerHTML='<span class="lb" style="background:'+c.color+'"></span>'+
+    '<span class="lt"><span class="lid">'+esc(card.id)+'</span>'+
+    '<span class="lname">'+esc(card.tzh)+'</span></span>'+
+    '<span class="rt">'+(drawn?'<span class="tick">✓</span>':'')+
+    '<span class="lvl '+esc(card.lvl)+'">'+esc(card.lvl)+'</span></span>';
+  b.onclick=()=>{ S.active=card.id; S.review=true; save();
+    if(S.ctx==='all') renderAll(); else renderDeck(false);
+    window.scrollTo(0,0); const app=document.querySelector('.app'); if(app) app.scrollTop=0; };
+  return b;
+}
+
+/* 洗牌：散開 → 收攏，共約 700ms */
+function doShuffle(){
+  const deck=document.getElementById('deck'); if(!deck) return;
+  const backs=Array.prototype.slice.call(deck.querySelectorAll('.back')), n=backs.length;
+  backs.forEach(b=>{
+    b.style.transition='transform 330ms cubic-bezier(.2,.7,.2,1)';
+    const dx=(Math.random()*2-1)*66, dy=(Math.random()*2-1)*42, r=(Math.random()*2-1)*20;
+    b.style.transform='translate('+dx+'px,'+dy+'px) rotate('+r+'deg)';
+  });
+  setTimeout(()=>backs.forEach((b,i)=>{b.style.transform=stackT(i,n);}),350);
+  setTimeout(()=>backs.forEach(b=>{b.style.transition='';}),700);
+}
+function reshuffle(){
+  S.order=S.order.slice(0,S.pos).concat(shuffled(S.order.slice(S.pos)));
+  save(); doShuffle();
+}
+function drawCard(){
+  if(S.active || S.pos>=S.order.length) return;
+  const deck=document.getElementById('deck'), top=deck&&deck.lastElementChild;
+  if(top) top.classList.add('fly');
+  setTimeout(()=>{ S.active=S.order[S.pos]; S.pos++; S.review=false; save(); renderDeck(false); },190);
+}
+
+/* ===== 卡片 ===== */
+function buildCard(card){
+  const c=catOf(card.cat);
+  const zone=document.createElement('div'); zone.className='cardzone';
+  const el=document.createElement('article'); el.className='card in';
+  el.innerHTML=
+    '<div class="cbar" style="background:'+c.color+'"></div><div class="pad">'+
+      '<div class="meta">'+
+        '<span class="chip" style="background:'+c.tint+';color:'+c.ink+';border-color:'+c.ink+'33">'+esc(c.short)+' · '+esc(c.label)+'</span>'+
+        '<span class="cid">'+esc(card.id)+'</span>'+
+        '<span class="lvl '+esc(card.lvl)+'">演算法相關 '+esc(card.lvl)+'</span>'+
+      '</div>'+
+      '<h2>'+esc(card.tzh)+'</h2>'+
+      '<div class="algo">'+esc(card.algo)+'</div>'+
+      '<details><summary>原卡版本</summary><div class="sub">'+esc(card.zh)+'</div></details>'+
+      
+    '</div>';
+  zone.appendChild(el);
+
+  const act=document.createElement('div'); act.className='actions';
+  const close=()=>{ S.active=null; S.review=false; save();
+    if(S.ctx==='all') renderAll(); else renderDeck(false); };
+  if(S.review){
+    const b1=document.createElement('button'); b1.type='button'; b1.className='ok'; b1.textContent='關閉';
+    b1.onclick=close; act.appendChild(b1);
+    if(S.ctx==='deck' && S.mode==='draw' && S.pos<S.order.length){
+      const b2=document.createElement('button'); b2.type='button'; b2.className='go'; b2.textContent='繼續抽卡 →';
+      b2.onclick=()=>{ close(); setTimeout(drawCard,40); }; act.appendChild(b2);
+    }
+  }else{
+    const b1=document.createElement('button'); b1.type='button'; b1.className='ok'; b1.textContent='聊過了';
+    b1.onclick=()=>dismiss(false);
+    const b2=document.createElement('button'); b2.type='button'; b2.className='go'; b2.textContent='下一張 →';
+    b2.onclick=()=>dismiss(true);
+    act.appendChild(b1); act.appendChild(b2);
+  }
+  zone.appendChild(act);
+  return zone;
+}
+function dismiss(thenDraw){
+  const el=document.querySelector('.card'); if(!el) return;
+  const id=S.active;
+  el.classList.remove('in'); el.classList.add('out');
+  const a=document.querySelector('.actions'); if(a) a.style.visibility='hidden';
+  setTimeout(()=>{
+    if(S.seen.indexOf(id)<0) S.seen.push(id);
+    S.active=null; S.review=false; save(); renderDeck(false);
+    if(thenDraw && S.pos<S.order.length) setTimeout(drawCard,40);
+  },340);
+}
+function renderSeen(show2){
+  const box=document.getElementById('seenBox'); box.innerHTML='';
+  if(!show2 || !S.seen.length || S.mode==='list') return;
+  const d=document.createElement('div'); d.className='seen';
+  d.innerHTML='<div class="lb2">已看過（'+S.seen.length+'）　點卡片可重看</div>';
+  const strip=document.createElement('div'); strip.className='strip';
+  S.seen.forEach(id=>{
+    const card=byId(id), c=catOf(card.cat);
+    const s=document.createElement('div'); s.className='scard';
+    s.innerHTML='<div class="sb" style="background:'+c.color+'"></div><div class="sp2">'+
+      '<div class="si">'+esc(card.id)+'</div><div class="sn">'+esc(card.tzh)+'</div></div>';
+    s.onclick=()=>{ S.active=id; S.review=true; save(); renderDeck(false); window.scrollTo(0,0); };
+    strip.appendChild(s);
+  });
+  d.appendChild(strip); box.appendChild(d);
+}
+
+/* ===== 全部展開 ===== */
+document.getElementById('allBtn').onclick=()=>{
+  S.ctx='all'; S.active=null; S.review=false; save(); show('v-all'); renderAll();
+};
+function renderAll(){
+  document.getElementById('allCount').textContent='共 '+CARDS.length+' 張　依主題排列';
+  const box=document.getElementById('allBody'); box.innerHTML='';
+  if(S.active){ box.appendChild(buildCard(byId(S.active))); return; }
+  CATS.forEach(c=>{
+    const cards=CARDS.filter(x=>x.cat===c.key);
+    if(!cards.length) return;
+    const h=document.createElement('div'); h.className='grp';
+    h.innerHTML='<span class="gl" style="background:'+c.color+'"></span>'+
+      esc(c.label)+'　'+cards.length+' 張';
+    box.appendChild(h);
+    const l=document.createElement('div'); l.className='list';
+    cards.forEach(cd=>l.appendChild(listRow(cd,false)));
+    box.appendChild(l);
+  });
+}
+
+/* ===== 啟動 ===== */
+load(); applyFrame(); renderHome(); syncSeg();
+if(S.ctx==='all'){ show('v-all'); renderAll(); }
+else if(S.cat && catOf(S.cat)){ show('v-deck'); renderDeck(false); }
+</script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>看懂演算法親子課｜LINE 介面模擬 demo</title>
+<style>
+:root{
+  --bg:#F3EDE1; --surface:#FBF7F0; --line:#E2D6C0; --line-soft:#EFE7D8;
+  --ink:#241F1A; --ink-2:#5F574C; --ink-3:#9A9084;
+  --clay:#C97A45; --clay-deep:#A85D2E; --clay-tint:#FBEEE1; --clay-line:#EBD3B4;
+  --moss:#4E8A62; --moss-deep:#3A6B4B; --moss-tint:#E7F0E7; --moss-line:#CDE0D2;
+  --chat-bg:#E8E0D2;
+  --r-sm:10px; --r-md:16px; --r-lg:20px; --r-pill:999px;
+  --sh-1:0 2px 8px rgba(74,58,38,.06); --sh-2:0 8px 22px rgba(74,58,38,.10); --sh-3:0 22px 44px rgba(74,58,38,.20);
+  --serif:"Noto Serif TC","Songti TC",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --msg:15.5px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(120% 70% at 50% -10%,#FDF1DF 0%,rgba(253,241,223,0) 62%),var(--bg);
+     color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+body.big{--msg:18.5px}
+
+/* ===== 頂部控制列 ===== */
+.bar{max-width:1180px;margin:0 auto;padding:18px 16px 6px}
+.bar h1{font:700 23px/1.3 var(--serif);margin:0 0 2px}
+.bar .sub{font-size:13px;color:var(--ink-2);margin-bottom:14px}
+.ctrls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-pill);padding:3px;gap:2px}
+.seg button{border:none;background:none;font:700 14px var(--sans);color:var(--ink-2);padding:8px 16px;border-radius:var(--r-pill);cursor:pointer;transition:.18s var(--ease)}
+.seg button[aria-pressed="true"]{background:var(--clay);color:#fff}
+.btn{border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-pill);padding:9px 17px;font:700 14px var(--sans);color:var(--ink);cursor:pointer;transition:.18s var(--ease)}
+.btn:hover{box-shadow:var(--sh-1);transform:translateY(-1px)}
+.btn.primary{background:var(--moss);border-color:var(--moss);color:#fff}
+.btn.ghost{background:none}
+.btn:disabled{opacity:.42;cursor:default;transform:none;box-shadow:none}
+.tally{font:700 13px var(--mono);color:var(--clay-deep);background:var(--clay-tint);border:1px solid var(--clay-line);border-radius:var(--r-pill);padding:7px 13px;letter-spacing:.04em}
+
+/* ===== 舞台 ===== */
+.stage{max-width:1180px;margin:0 auto;padding:16px;display:flex;gap:26px;justify-content:center;align-items:flex-start}
+
+/* ===== 手機外框 ===== */
+.phone{width:398px;flex:none;background:#2A2621;border-radius:42px;padding:11px;box-shadow:var(--sh-3);position:relative}
+.phone::before{content:"";position:absolute;top:19px;left:50%;transform:translateX(-50%);width:104px;height:22px;background:#2A2621;border-radius:var(--r-pill);z-index:6}
+.screen{background:var(--chat-bg);border-radius:32px;overflow:hidden;display:flex;flex-direction:column;height:706px;position:relative}
+.statusbar{height:34px;background:var(--surface);display:flex;align-items:flex-end;justify-content:space-between;padding:0 20px 4px;font:600 11.5px var(--sans);color:var(--ink-2)}
+.chathead{background:var(--surface);border-bottom:1px solid var(--line);padding:9px 14px;display:flex;align-items:center;gap:10px}
+.ava{width:38px;height:38px;border-radius:50%;flex:none;background:linear-gradient(140deg,var(--clay),var(--moss));display:flex;align-items:center;justify-content:center;color:#fff;font:700 17px var(--serif)}
+.chathead .nm{font:700 14.5px var(--sans);line-height:1.3}
+.chathead .of{font:600 10px var(--sans);color:var(--moss-deep);background:var(--moss-tint);border:1px solid var(--moss-line);border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:2px}
+.chathead .cnt{font-size:11.5px;color:var(--ink-3)}
+
+.chat{flex:1;overflow-y:auto;padding:14px 13px 8px;scroll-behavior:smooth}
+.daydiv{text-align:center;margin:12px 0 14px}
+.daydiv span{background:rgba(90,75,55,.24);color:#fff;font:700 11.5px var(--sans);padding:4px 13px;border-radius:var(--r-pill);letter-spacing:.03em}
+.row{display:flex;gap:8px;margin-bottom:13px;align-items:flex-end;animation:pop .34s var(--ease) both}
+@keyframes pop{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:none}}
+.row .mini{width:30px;height:30px;border-radius:50%;flex:none;background:linear-gradient(140deg,var(--clay),var(--moss));display:flex;align-items:center;justify-content:center;color:#fff;font:700 13px var(--serif)}
+.bub{max-width:266px;background:var(--surface);border:1px solid var(--line-soft);border-radius:4px 16px 16px 16px;padding:11px 13px;font-size:var(--msg);line-height:1.78;white-space:pre-wrap;box-shadow:var(--sh-1)}
+.row.me{justify-content:flex-end}
+.row.me .bub{background:var(--moss);color:#fff;border-color:var(--moss);border-radius:16px 4px 16px 16px;max-width:210px}
+.tagline{font:700 10.5px var(--mono);color:var(--clay-deep);letter-spacing:.1em;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.chip-common{background:var(--moss-tint);color:var(--moss-deep);border:1px solid var(--moss-line);border-radius:4px;padding:0 5px;font-size:9.5px;letter-spacing:0}
+.taskbtn{display:block;width:100%;margin-top:10px;background:var(--clay);color:#fff;border:none;border-radius:var(--r-sm);padding:11px;font:700 14px var(--sans);cursor:pointer;transition:.18s var(--ease)}
+.taskbtn:hover{background:var(--clay-deep)}
+.typing{display:inline-flex;gap:4px;padding:14px 15px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);animation:blink 1.1s infinite}
+.typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+@keyframes blink{0%,80%,100%{opacity:.28}40%{opacity:1}}
+
+/* 快速回覆 */
+.quick{padding:0 13px 10px;display:flex;gap:8px;flex-wrap:wrap}
+.quick button{background:var(--surface);border:1.5px solid var(--moss);color:var(--moss-deep);border-radius:var(--r-pill);padding:8px 15px;font:700 13.5px var(--sans);cursor:pointer;animation:pop .3s var(--ease) both}
+.quick button:hover{background:var(--moss-tint)}
+
+/* 圖文選單 */
+.menubar{background:var(--surface);border-top:1px solid var(--line);padding:7px 12px;display:flex;align-items:center;justify-content:space-between}
+.menubar .inp{flex:1;background:var(--chat-bg);border-radius:var(--r-pill);height:32px;display:flex;align-items:center;padding:0 13px;font-size:12.5px;color:var(--ink-3)}
+.menubar .tg{border:none;background:var(--clay-tint);border:1px solid var(--clay-line);color:var(--clay-deep);border-radius:8px;width:36px;height:32px;margin-left:8px;cursor:pointer;font-size:15px;line-height:1}
+.richmenu{background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);max-height:250px;overflow:hidden;transition:max-height .35s var(--ease)}
+.richmenu.hide{max-height:0;border-top:0}
+.rm{border:none;border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);background:var(--surface);padding:9px 5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:.18s var(--ease);min-height:74px;justify-content:center}
+.rm:hover{background:var(--clay-tint)}
+.rm.wide{grid-column:span 3}
+.rm .ic{width:27px;height:27px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font:700 13px var(--serif);flex:none}
+.rm .lb{font:700 11.5px var(--sans);color:var(--ink);line-height:1.3;text-align:center}
+.rm .sm{font-size:9.5px;color:var(--ink-3);line-height:1.35;text-align:center}
+
+.watermark{position:absolute;bottom:8px;right:10px;z-index:7;background:rgba(36,31,26,.72);color:#fff;font:600 9.5px var(--sans);padding:3px 8px;border-radius:var(--r-pill);letter-spacing:.02em;pointer-events:none}
+
+/* ===== 側欄訊息清單 ===== */
+.side{width:318px;flex:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-2);padding:16px 15px;max-height:728px;overflow-y:auto}
+.side h2{font:700 15px var(--serif);margin:0 0 3px}
+.side .hint{font-size:11.5px;color:var(--ink-2);margin-bottom:12px;line-height:1.65}
+.li{display:flex;gap:9px;align-items:flex-start;padding:8px 9px;border-radius:var(--r-sm);cursor:pointer;transition:.16s var(--ease);border:1px solid transparent}
+.li:hover{background:var(--clay-tint)}
+.li.cur{background:var(--clay-tint);border-color:var(--clay-line)}
+.li.off{opacity:.3}
+.li .code{font:700 10.5px var(--mono);color:var(--clay-deep);flex:none;width:34px;padding-top:2px;letter-spacing:.02em}
+.li .tx{font-size:12px;color:var(--ink-2);line-height:1.5}
+.li .tx b{color:var(--ink);font-weight:700}
+.li .dot{width:7px;height:7px;border-radius:50%;flex:none;margin-top:5px;background:var(--line)}
+.li.seen .dot{background:var(--moss)}
+.wk{font:700 10.5px var(--mono);color:var(--ink-3);letter-spacing:.1em;margin:12px 0 5px;padding-left:3px}
+.legend{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-2);line-height:1.8}
+.legend .chip-common{display:inline-block;margin-right:4px}
+
+footer{text-align:center;color:var(--ink-3);font-size:11px;padding:18px 16px 40px;line-height:1.8}
+@media(max-width:980px){.side{display:none}.stage{padding:10px}.phone{width:100%;max-width:398px}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <h1>看懂演算法親子課｜LINE 介面模擬</h1>
+  <div class="sub">看懂演算法親子課 · 五週 LINE 推播示意（研究用 demo）</div>
+  <div class="ctrls">
+    <div class="seg" id="grp">
+      <button data-g="exp" aria-pressed="true">實驗組（完整介入）</button>
+      <button data-g="ctl" aria-pressed="false">對照組（簡化介入）</button>
+    </div>
+    <button class="btn primary" id="next">下一則 ▸</button>
+    <button class="btn" id="play">▶ 自動播放</button>
+    <button class="btn ghost" id="all">全部顯示</button>
+    <button class="btn ghost" id="reset">↺ 重設</button>
+    <button class="btn ghost" id="zoom">Ａ 放大字級</button>
+    <span class="tally" id="tally"></span>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="phone">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span>▂▄▆ ＷiFi ▮</span></div>
+      <div class="chathead">
+        <div class="ava">演</div>
+        <div>
+          <div class="nm" id="headnm"></div>
+          <div class="cnt" id="headcnt"></div>
+        </div>
+      </div>
+      <div class="chat" id="chat"></div>
+      <div class="quick" id="quick"></div>
+      <div class="menubar">
+        <div class="inp">輸入訊息…</div>
+        <button class="tg" id="tg" title="開關圖文選單">▤</button>
+      </div>
+      <div class="richmenu" id="rich"></div>
+      <div class="watermark">模擬畫面，非真實 LINE 服務</div>
+    </div>
+  </div>
+
+  <aside class="side">
+    <h2>推播清單</h2>
+    <div class="hint">灰階者為<b>探索班（簡化介入）收不到</b>的訊息。點任一則可直接跳到該則。</div>
+    <div id="list"></div>
+    <div class="legend">
+      <span class="chip-common">共</span>兩組皆收到（8 則）<br>
+      未標示者僅完整介入組收到（10 則，含親子共學任務與學習單）
+    </div>
+  </aside>
+</div>
+
+<footer>
+  模擬畫面，非真實 LINE 服務；未使用 LINE 之商標、標誌或品牌識別。<br>
+  第一至三週、第五週訊息引自《介入方案範本_親子共學與家長訊息_20260910》；第四週（親子溝通與管教效能）為 2026-09-14 新增。
+</footer>
+
+<script>
+/* =========================================================
+   五週五單元　共 18 則（開場 1 ＋ 五週 17）
+   兩組皆收【共】8 則　·　僅完整介入組 10 則
+   ========================================================= */
+var MSGS = [
+ {id:'W0-1', wk:'開場', wn:0, common:true, kind:'開場',
+  text:'您好，歡迎加入。\n接下來五週，我們不會考您任何名詞。\n只想先問一個問題：您有沒有發現，孩子的 YouTube 首頁和您的完全不一樣？\n那不是巧合。這五週，我們一起把它看懂。\n每週只要花二十分鐘，和孩子做一件事。'},
+
+ /* 第一週　演算法覺察與認知素養 */
+ {id:'W1-1', wk:'第一週｜演算法覺察與認知素養', wn:1, common:true, kind:'概念',
+  text:'有位家長說：「我點擊率比較高的類別，它就會比較常出現。」\n他說自己其實沒聽過「演算法」這個名詞，但早就感覺到規律了。\n您不需要懂技術，也已經有觀察。\n這週我們只練一件事：把觀察說出來。'},
+ {id:'W1-2', wk:'第一週｜演算法覺察與認知素養', wn:1, common:false, kind:'任務', unit:1,
+  text:'本週任務：首頁大不同（約 15 分鐘）\n和孩子各自打開 YouTube 首頁，各記下最前面 5 則的主題。\n然後問彼此一句話：「我做了什麼，讓它變成這樣？」\n點下方連結領學習單 →'},
+ {id:'W1-3', wk:'第一週｜演算法覺察與認知素養', wn:1, common:false, kind:'反思回收', checkin:true,
+  text:'提醒一件容易忽略的事：\n平台看得到您「點了」，看不到您「為什麼點」。\n一時好奇點進去，和真的喜歡，對平台來說可能是同一件事。\n孩子因為同學傳、因為獵奇而停留，不代表他喜歡。\n完成任務了嗎？回覆「1」即可打卡。'},
+
+ /* 第二週　演算法批判素養 */
+ {id:'W2-1', wk:'第二週｜演算法批判素養', wn:2, common:true, kind:'概念',
+  text:'有位媽媽說：「臉書的演算法是給誰？他把流量給誰？給有付費的人。」\n推薦順序不只看您喜歡什麼，也看誰付了錢。\n這週看的是同一件事的另一面：它為什麼想讓您一直看、一直買？'},
+ {id:'W2-2', wk:'第二週｜演算法批判素養', wn:2, common:false, kind:'任務', unit:2,
+  text:'本週任務：找出三個「想讓你掏錢」的設計（約 20 分鐘）\n打開孩子常玩的遊戲商店頁或一支開箱影片，一起找出三個讓人想繼續看或想付錢的設計。\n限時倒數？首儲禮包？抽卡動畫？進度只差一點？自動播下一支？\n找到就記下來。'},
+ {id:'W2-3', wk:'第二週｜演算法批判素養', wn:2, common:true, kind:'延伸',
+  text:'同一套推薦機制，換個商品也一樣運作。\n推遊戲禮包的邏輯，和推電子煙、酒精、減肥產品的邏輯是同一套。\n差別只在推給誰、推什麼。\n所以看懂機制，比記住哪些東西危險更有用。'},
+ {id:'W2-4', wk:'第二週｜演算法批判素養', wn:2, common:false, kind:'反思回收',
+  text:'這週留一個問題給您和孩子：\n「推薦得很準，是不是就等於對我好？」\n有位爸爸說他喜歡推薦準，但也因為「下一個也是喜歡看的」，一看就三十分鐘。\n準確和有益，不一定是同一件事。'},
+
+ /* 第三週　演算法因應 */
+ {id:'W3-1', wk:'第三週｜演算法因應', wn:3, common:true, kind:'概念',
+  text:'有位媽媽的作法很值得學：\n「當我發現他一直給我同溫層的訊息，我就會去點一些異溫層的東西回來。」\n她不只是抱怨，她改變了自己的點擊。\n您的每一次點擊，都在回頭訓練推薦。'},
+ {id:'W3-2', wk:'第三週｜演算法因應', wn:3, common:false, kind:'任務', unit:3,
+  text:'本週任務：訓練演算法七天挑戰\n和孩子一起做四個動作：\n①對不想看的按「不感興趣」　②取消追蹤一個帳號　③主動搜尋一個真正想看的主題並看完　④關閉自動播放與通知\n七天後再看首頁，比較差別。'},
+ {id:'W3-3', wk:'第三週｜演算法因應', wn:3, common:false, kind:'停一下條款',
+  text:'提醒一個具體約定：\n遇到「要花錢、要加陌生人、要給帳號密碼」——先停下來，找爸媽。\n這一條比封鎖有效，因為封鎖鎖不完，但「停一下」永遠有用。\n今天就和孩子講好這一句。'},
+ {id:'W3-4', wk:'第三週｜演算法因應', wn:3, common:false, kind:'反思回收', checkin:true,
+  text:'有個孩子在訪談裡說：「我可以控制我的演算法。」\n這就是這週的目標。\n七天到了，和孩子一起看看首頁變了沒？回覆「1」打卡，也歡迎傳截圖給我們。'},
+
+ /* 第四週　親子溝通與管教效能（2026-09-14 新增） */
+ {id:'W4-1', wk:'第四週｜親子溝通與管教效能', wn:4, common:true, kind:'概念',
+  text:'有位家長說：我一開口他就關機。\n孩子不是不知道規則，是不想被命令。\n同樣一件事，「你怎麼又在滑」和「我看到你剛剛看了很久、我有點擔心」，孩子接到的是兩回事。\n這週我們不談演算法，談怎麼開口。'},
+ {id:'W4-2', wk:'第四週｜親子溝通與管教效能', wn:4, common:false, kind:'任務', unit:4,
+  text:'本週任務：一次好好說，約二十分鐘。\n挑一則孩子最近看過的推薦內容，用「我看到、我覺得、我希望」開啟對話。\n孩子回應之後，只做一件事：把他說的話複述一次，不評論。\n點下方連結領學習單。'},
+ {id:'W4-3', wk:'第四週｜親子溝通與管教效能', wn:4, common:false, kind:'反思回收', checkin:true,
+  text:'行為底下常有沒說出口的需求：想跟同學有話題、想被看見、想放鬆。\n看見需求，規則才談得下去。\n今天可以試一句：你好像很喜歡這個，跟我說說？\n完成任務了嗎？回覆 1 即可打卡。'},
+
+ /* 第五週　家庭數位公約（原第四週整組移入） */
+ {id:'W5-1', wk:'第五週｜家庭數位公約', wn:5, common:true, kind:'概念',
+  text:'有位爸爸談 YouTube Kids 時說：「我發現鎖不完。」\n這不是家長不夠努力。\n只要推薦系統一直產生類似內容，一支一支封鎖的成本就非常高。\n所以最後一週，我們不做封鎖，我們做約定。'},
+ {id:'W5-2', wk:'第五週｜家庭數位公約', wn:5, common:false, kind:'任務', unit:5,
+  text:'本週任務：我們家的演算法公約（約 20 分鐘）\n一起訂三條規則＋一條停一下條款，寫在同一張紙上，親子一起簽名。\n提醒：規則裡留一點緩衝。有位媽媽說孩子「要玩到一個段落才會停」，所以她會多給三到五分鐘。\n有緩衝的規則，才守得住。'},
+ {id:'W5-3', wk:'第五週｜家庭數位公約', wn:5, common:true, kind:'收尾',
+  text:'五週結束了。\n如果只帶走一句話，我們希望是這句：\n「我的推薦頁正在把我變成什麼樣的使用者？」\n這個問題，孩子長大以後每年都用得上。\n謝謝您這五週的參與，最後請協助完成後測 →'}
+];
+
+/* 五個單元（供圖文選單與任務按鈕使用） */
+var UNITS = [
+ {n:1, t:'單元一', s:'演算法覺察與認知素養', c:'#7FA3BE', ic:'一'},
+ {n:2, t:'單元二', s:'演算法批判素養',       c:'#D08C55', ic:'二'},
+ {n:3, t:'單元三', s:'演算法因應',           c:'#6E9E77', ic:'三'},
+ {n:4, t:'單元四', s:'親子溝通與管教效能',   c:'#A98BB8', ic:'四'},
+ {n:5, t:'單元五', s:'家庭數位公約',         c:'#8792C0', ic:'五'}
+];
+
+/* 單元 → 任務頁錨點對照（任務頁 demo 已同步為五單元） */
+var UNIT_PAGE = {1:1, 2:2, 3:3, 4:4, 5:5};
+
+var GROUP_NAME = {exp:'看懂演算法親子課－首頁班', ctl:'看懂演算法親子課－探索班'};
+
+/* ============ 狀態 ============ */
+var TASK_FILE = 'tasks.html';
+var state = {group:'exp', n:0, extras:[], playing:false, timer:null};
+function list(){ return state.group==='exp' ? MSGS : MSGS.filter(function(m){return m.common;}); }
+
+function save(){ try{ localStorage.setItem('linedemo5', JSON.stringify({g:state.group,n:state.n})); }catch(e){} }
+function load(){ try{ var d=JSON.parse(localStorage.getItem('linedemo5')||'null'); if(d){state.group=d.g||'exp'; state.n=d.n||0;} }catch(e){} }
+
+/* ============ 繪製 ============ */
+var chat=document.getElementById('chat'), quick=document.getElementById('quick');
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function render(){
+  var L=list(), shown=L.slice(0,state.n), lastWk='';
+  chat.innerHTML='';
+  shown.forEach(function(m){
+    if(m.wk!==lastWk){
+      lastWk=m.wk;
+      var d=document.createElement('div'); d.className='daydiv';
+      d.innerHTML='<span>'+esc(m.wk)+'</span>'; chat.appendChild(d);
+    }
+    chat.appendChild(bubble(m));
+    (state.extras||[]).forEach(function(x){ if(x.after===m.id) chat.appendChild(extraRow(x)); });
+  });
+  renderQuick(shown);
+  renderList();
+  richMenu();
+
+  var total=L.length, cur=shown[shown.length-1];
+  document.getElementById('tally').textContent =
+    state.group==='exp'
+      ? ('開場 1 ＋ 五週 17 則 ＝ 共 18 則　·　已播 '+state.n)
+      : ('兩組皆收 8 則　·　已播 '+state.n);
+  document.getElementById('headnm').innerHTML =
+    esc(GROUP_NAME[state.group])+'<span class="of">研究模擬</span>';
+  document.getElementById('headcnt').textContent =
+    (!cur || cur.wn===0) ? '準備開始　/　共 5 週' : ('第 '+cur.wn+' 週　/　共 5 週');
+  document.getElementById('next').disabled = state.n>=total;
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function bubble(m){
+  var row=document.createElement('div'); row.className='row';
+  var tag='<div class="tagline">'+esc(m.id)+' · '+esc(m.kind)+
+          (m.common?' <span class="chip-common">共</span>':'')+'</div>';
+  var btn = m.unit ? '<button class="taskbtn" data-u="'+m.unit+'">開啟任務　'+esc(UNITS[m.unit-1].t)+' →</button>' : '';
+  row.innerHTML='<div class="mini">演</div><div class="bub">'+tag+esc(m.text)+btn+'</div>';
+  return row;
+}
+function extraRow(x){
+  var row=document.createElement('div'); row.className='row'+(x.me?' me':'');
+  row.innerHTML = x.me ? '<div class="bub">'+esc(x.text)+'</div>'
+                       : '<div class="mini">演</div><div class="bub">'+esc(x.text)+'</div>';
+  return row;
+}
+function renderQuick(shown){
+  quick.innerHTML='';
+  var last = shown[shown.length-1];
+  if(!last) return;
+  if(last.checkin && !state.extras.some(function(x){return x.after===last.id;})){
+    var b=document.createElement('button');
+    b.textContent='回覆「1」打卡';
+    b.onclick=function(){
+      state.extras.push({after:last.id, me:true, text:'1'});
+      state.extras.push({after:last.id, me:false, text:'✓ 打卡成功。已記錄您本週的完成狀況，謝謝您和孩子一起完成這件事。'});
+      render();
+    };
+    quick.appendChild(b);
+  }
+}
+function renderList(){
+  var box=document.getElementById('list'); box.innerHTML='';
+  var L=list(), lastWk='';
+  MSGS.forEach(function(m){
+    if(m.wk!==lastWk){ lastWk=m.wk;
+      var h=document.createElement('div'); h.className='wk'; h.textContent=m.wk; box.appendChild(h); }
+    var inGroup = state.group==='exp' || m.common;
+    var idx = L.indexOf(m);
+    var seen = inGroup && idx>-1 && idx < state.n;
+    var cur  = inGroup && idx === state.n-1;
+    var d=document.createElement('div');
+    d.className='li'+(inGroup?'':' off')+(seen?' seen':'')+(cur?' cur':'');
+    d.innerHTML='<span class="dot"></span><span class="code">'+esc(m.id)+'</span>'+
+      '<span class="tx"><b>'+esc(m.kind)+'</b>'+(m.common?' <span class="chip-common">共</span>':'')+
+      '<br>'+esc(m.text.split('\n')[0].slice(0,22))+'…</span>';
+    if(inGroup) d.onclick=function(){ stop(); state.n=idx+1; save(); render(); };
+    box.appendChild(d);
+  });
+}
+
+/* ============ 播放控制 ============ */
+function next(cb){
+  var L=list();
+  if(state.n>=L.length){ stop(); return; }
+  var row=document.createElement('div'); row.className='row';
+  row.innerHTML='<div class="mini">演</div><div class="bub"><span class="typing"><i></i><i></i><i></i></span></div>';
+  chat.appendChild(row); chat.scrollTop=chat.scrollHeight;
+  setTimeout(function(){ state.n++; save(); render(); if(cb) cb(); }, 620);
+}
+function play(){
+  if(state.playing) return stop();
+  state.playing=true; document.getElementById('play').textContent='⏸ 暫停';
+  var step=function(){
+    if(!state.playing) return;
+    if(state.n>=list().length) return stop();
+    next(function(){ if(state.playing) state.timer=setTimeout(step,2100); });
+  };
+  step();
+}
+function stop(){
+  state.playing=false; clearTimeout(state.timer);
+  document.getElementById('play').textContent='▶ 自動播放';
+}
+
+/* ============ 圖文選單 ============
+   完整介入組（首頁班）7 格：五個單元 ＋ 學習單下載 ＋ 前後測
+   簡化介入組（探索班）6 格：五個單元（僅重點說明）＋ 前後測
+   —— 探索班無「親子共學任務」與「學習單」入口
+================================================= */
+function openTask(u){
+  var a = UNIT_PAGE[u];
+  var url = TASK_FILE + (a ? '#u'+a : '');
+  try{ window.open(url,'_blank'); }catch(e){}
+}
+function anchorMsg(){
+  var a = list()[state.n-1];
+  if(!a){ state.n=1; save(); a=list()[0]; }
+  return a;
+}
+function richMenu(){
+  var box=document.getElementById('rich'); box.innerHTML='';
+  var full = state.group==='exp';
+  var cells = UNITS.map(function(u){
+    return {t:u.t, s:u.s, c:u.c, ic:u.ic, act:'unit', n:u.n};
+  });
+  if(full) cells.push({t:'學習單下載', s:'本週任務單', c:'#C97A45', ic:'單', act:'sheet'});
+  cells.push({t:'前後測', s:'問卷入口', c:'#5F574C', ic:'測', act:'survey'});
+
+  var rem = cells.length % 3;
+  cells.forEach(function(r,i){
+    var b=document.createElement('button');
+    b.className='rm'+((rem===1 && i===cells.length-1)?' wide':'');
+    b.innerHTML='<span class="ic" style="background:'+r.c+'">'+r.ic+'</span>'+
+                '<span class="lb">'+esc(r.t)+'</span><span class="sm">'+esc(r.s)+'</span>';
+    b.onclick=function(){
+      var an=anchorMsg();
+      if(r.act==='unit'){
+        if(full){
+          openTask(r.n);
+          state.extras.push({after:an.id, me:false,
+            text:'已為您開啟「'+r.t+'　'+r.s+'」的親子共學任務頁 →（若未自動開啟，請點訊息中的「開啟任務」按鈕）'});
+        }else{
+          state.extras.push({after:an.id, me:false,
+            text:'第 '+r.n+' 週：'+r.s+'\n本班提供每週重點說明，親子共學任務與學習單不在本班的內容中。'});
+        }
+      }else if(r.act==='sheet'){
+        openTask(0);
+        state.extras.push({after:an.id, me:false, text:'已為您開啟本週學習單頁面，五個單元的任務都在裡面 →'});
+      }else{
+        state.extras.push({after:an.id, me:false,
+          text:'問卷入口（研究用示意）\n・前測問卷：加入時填寫\n・後測問卷：第五週結束後填寫\n實際施測將以獨立連結發送。'});
+      }
+      render();
+    };
+    box.appendChild(b);
+  });
+}
+
+/* ============ 事件 ============ */
+document.getElementById('grp').addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b) return;
+  stop();
+  state.group=b.dataset.g; state.n=0; state.extras=[];
+  [].forEach.call(this.children,function(x){ x.setAttribute('aria-pressed', x===b); });
+  save(); render();
+});
+document.getElementById('next').onclick=function(){ stop(); next(); };
+document.getElementById('play').onclick=play;
+document.getElementById('all').onclick=function(){ stop(); state.n=list().length; save(); render(); };
+document.getElementById('reset').onclick=function(){
+  stop(); state.n=0; state.extras=[];
+  try{ localStorage.removeItem('linedemo5'); }catch(e){}
+  render();
+};
+document.getElementById('zoom').onclick=function(){
+  document.body.classList.toggle('big');
+  this.textContent = document.body.classList.contains('big') ? 'Ａ 還原字級' : 'Ａ 放大字級';
+};
+document.getElementById('tg').onclick=function(){ document.getElementById('rich').classList.toggle('hide'); };
+chat.addEventListener('click',function(e){
+  var b=e.target.closest('.taskbtn'); if(!b) return;
+  openTask(parseInt(b.dataset.u,10));
+});
+
+/* ============ 啟動 ============ */
+load();
+[].forEach.call(document.getElementById('grp').children,function(x){
+  x.setAttribute('aria-pressed', x.dataset.g===state.group);
+});
+render();
+</script>
+</body>
+</html>

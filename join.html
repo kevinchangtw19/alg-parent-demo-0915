@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>加入流程 demo｜看懂演算法親子課</title>
+<style>
+:root{--bg:#F3EDE1;--surface:#FBF7F0;--line:#E2D6C0;--line-soft:#EFE7D8;--ink:#241F1A;
+--clay:#C97A45;--clay-deep:#A85D2E;--clay-tint:#FBEEE1;--clay-line:#EBD3B4;
+--moss:#4E8A62;--moss-deep:#3A6B4B;--moss-tint:#E7F0E7;--moss-line:#CDE0D2;
+--chat-bg:#E8E0D2;--r-sm:10px;--r-md:16px;--r-lg:20px;--r-pill:999px;
+--serif:"Noto Serif TC","Songti TC",serif;
+--sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);padding:28px 32px 48px}
+h1{font-family:var(--serif);font-size:26px;margin:0 0 4px}
+.sub{color:#6B6058;font-size:14px;margin:0 0 22px}
+.steps{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:18px;width:320px;flex:0 0 auto}
+.n{display:inline-block;background:var(--clay);color:#fff;border-radius:var(--r-pill);
+  font-size:13px;padding:3px 12px;margin-bottom:10px;letter-spacing:.04em}
+.t{font-family:var(--serif);font-size:19px;margin:0 0 8px}
+.d{font-size:14px;color:#544A42;line-height:1.75;margin:0 0 12px}
+.sheet{background:#fff;border:1px solid var(--line-soft);border-radius:var(--r-md);padding:14px;text-align:center}
+.sheet h4{font-family:var(--serif);font-size:15px;margin:0 0 2px}
+.sheet p{font-size:12px;color:#6B6058;margin:0 0 10px;line-height:1.6}
+.qrrow{display:flex;gap:10px;justify-content:center}
+.qrbox{border:1px solid var(--line);border-radius:var(--r-sm);padding:8px;background:var(--surface);width:132px}
+.qrbox img{width:100%;display:block;border-radius:4px}
+.qrcap{font-size:11px;margin-top:6px;color:#544A42;line-height:1.5}
+.pill{display:inline-block;font-size:11px;border-radius:var(--r-pill);padding:2px 9px;margin-top:4px}
+.pill.home{background:var(--clay-tint);border:1px solid var(--clay-line);color:var(--clay-deep)}
+.pill.exp{background:var(--moss-tint);border:1px solid var(--moss-line);color:var(--moss-deep)}
+.phone{border:9px solid #1d1d1f;border-radius:30px;background:var(--surface);overflow:hidden;width:284px;margin:0 auto}
+.bar{background:var(--surface);padding:7px 14px;font-size:11px;color:#6B6058;display:flex;justify-content:space-between}
+.add{padding:24px 18px;text-align:center;border-top:1px solid var(--line-soft)}
+.ava{width:62px;height:62px;border-radius:var(--r-pill);background:var(--clay);color:#fff;
+  font-family:var(--serif);font-size:26px;line-height:62px;margin:0 auto 10px}
+.nm{font-family:var(--serif);font-size:16px;margin:0 0 2px}
+.mini{font-size:12px;color:#6B6058;margin:0 0 16px}
+.btn{background:var(--moss);color:#fff;border:0;border-radius:var(--r-pill);
+  padding:10px 0;width:100%;font-size:14px;font-family:var(--sans)}
+.chat{background:var(--chat-bg);padding:14px 12px;min-height:250px}
+.hd{background:var(--surface);padding:9px 13px;border-bottom:1px solid var(--line-soft);
+  font-family:var(--serif);font-size:14px}
+.bub{background:#fff;border-radius:4px 14px 14px 14px;padding:11px 13px;font-size:12.5px;
+  line-height:1.85;max-width:232px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.bub b{color:var(--clay-deep)}
+.time{font-size:10px;color:#8A8078;margin:4px 0 0 6px}
+.note{margin-top:26px;font-size:12.5px;color:#6B6058;line-height:1.9;
+  border-top:1px solid var(--line);padding-top:14px;max-width:1040px}
+</style></head><body>
+
+<h1>看懂演算法親子課｜加入流程模擬</h1>
+<p class="sub">看懂演算法親子課・家長端加入步驟示意（研究用 demo）</p>
+
+<div class="steps">
+
+  <div class="step">
+    <span class="n">步驟一</span>
+    <p class="t">學生攜回家長說明單</p>
+    <p class="d">依班級分派結果，學生攜回對應組別之說明單。兩組之 QR code 不同，分別連往各自之 LINE 官方帳號。</p>
+    <div class="sheet">
+      <h4>和孩子一起，看懂演算法</h4>
+      <p>每週二十分鐘，五週結束<br>全程在 LINE 上進行</p>
+      <div class="qrrow">
+        <div class="qrbox"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQgAAAEICAIAAAAslP2oAAAFC0lEQVR4nO3dMW4dNxRA0SjIYpLsfy1JlqFOhZvUBi4LAiRIWueUgTx/rPwLAvPM4cePr8/fgJ/9fvoG4EbCgCAMCMKAIAwIwoAgDAjCgCAMCMKAIAwIwoAgDAjCgCAMCH/M/oG//vx7x30s9+9//+R/n73/0XVGRtefvZ/Zzz11P69/H0asGBCEAUEYEIQBQRgQhAFBGBCm5xgjq567z9o9l1j1ubuf96+6/qrfzyvfhxErBgRhQBAGBGFAEAYEYUAQBoRlc4yR256v754n3LbP4dS+lJHbvg8jVgwIwoAgDAjCgCAMCMKAIAwI2+cYt9n9XH/3Po1T77n6bqwYEIQBQRgQhAFBGBCEAUEYEL7dHGNk9rn+7rnHqnnFrFPvg7qNFQOCMCAIA4IwIAgDgjAgCAPC9jnGbc/FZ+cGp+YJs9c/dS74rNu+DyNWDAjCgCAMCMKAIAwIwoAgDAjL5hi/6vuIdj/X3+3U/b/+fbBiQBAGBGFAEAYEYUAQBgRhQPj48fV5+h6+tVXnV+zeN/LK3GYVKwYEYUAQBgRhQBAGBGFAEAaE6f0Yp567z97PyKl9CKveW7XK7nO+d89bdn/frBgQhAFBGBCEAUEYEIQBQRgQnj8f49S5EM7BWHudkVO/fysGBGFAEAYEYUAQBgRhQBAGhGXvlXpl38Xr97nbK+dm2I8BBwgDgjAgCAOCMCAIA4IwIEzPMV55Dn3qPldd59TPz3plvjTLigFBGBCEAUEYEIQBQRgQhAFh+znfr59Lfdv+itvO93j9fJIRKwYEYUAQBgRhQBAGBGFAEAaEZed8j9x23sLs546c2qdx21zlFOdjwAHCgCAMCMKAIAwIwoAgDAjTc4xVz8V3//zu5/e3vQfplFNzkt2fa8WAIAwIwoAgDAjCgCAMCMKAsGw/xm3Ps1dd55W5x+x1Vu0DuW2/zarrWDEgCAOCMCAIA4IwIAgDgjAgTM8xRl5/H9Sqn7/tfPGR188tGXE+BmwkDAjCgCAMCMKAIAwIwoCw7L1SI6/8O/7Zz511ah4y67b3ZZ36PVgxIAgDgjAgCAOCMCAIA4IwIGw/53uV2f0Jp/YVrDqfe/ZzV7ntPV2n5j9WDAjCgCAMCMKAIAwIwoAgDAgfP74+T9/DT07NJUZ2P49fdd7IK+eT3LbfY8SKAUEYEIQBQRgQhAFBGBCEAWF6jnHq+f1t93NqX8rIqjnAK3+v3fMQKwYEYUAQBgRhQBAGBGFAEAaE6/Zj7Hbbfo/dbtsvcWqfjHO+YQFhQBAGBGFAEAYEYUAQBoRnzseYddt7qGbtPkdilVVzA++VggcIA4IwIAgDgjAgCAOCMCBMzzFGbnuOPrJ7zrD7fm7bX/HK//dZVgwIwoAgDAjCgCAMCMKAIAwIy+YYI7ftc9jttvM0Vt3P7vufnbfs/j1bMSAIA4IwIAgDgjAgCAOCMCBsn2O84ld9j9Pun5+1an6y+/dvxYAgDAjCgCAMCMKAIAwIwoDw7eYYu+cVu/c5nNpfcdv7qbxXCg4QBgRhQBAGBGFAEAYEYUD4+PH1OfUHTv37+JHb7mfWqftftU9j5LZzPGZZMSAIA4IwIAgDgjAgCAOCMCAs249x6vyHWaf2P+y+/qrzwm+bJ8xadf9WDAjCgCAMCMKAIAwIwoAgDAjT+zHgO7BiQBAGBGFAEAYEYUAQBgRhQBAGBGFAEAYEYUAQBgRhQBAGBGFA+B/BTx2AqUM2KwAAAABJRU5ErkJggg==" alt="首頁班 QR code">
+          <div class="qrcap">首頁班<span class="pill home">完整介入</span></div></div>
+        <div class="qrbox"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQgAAAEICAIAAAAslP2oAAAFHklEQVR4nO3dQW4lNRRAUYJYDLD/tQDLyCyDnjBGuh5Y8sNV6XOGqLt+kc6VpXrf5Y8fX5+/AP/16+0bgCcSBgRhQBAGBGFAEAYEYUAQBgRhQBAGBGFAEAYEYUAQBgRhQPht9y/88fufE/dx3N///JX/fff+T11n19M+d+Xtvw8rVgwIwoAgDAjCgCAMCMKAIAwI23OMld3nxKdMP0c/df3pucTu9U/9+d37mXbq52nFgCAMCMKAIAwIwoAgDAjCgHBsjrEy/Zz+1HVOPe9fedp84NT9nPrcXdP3acWAIAwIwoAgDAjCgCAMCMKAMD7HeJrp/Qmn5hsr03OPW/ONp7FiQBAGBGFAEAYEYUAQBgRhQPjp5hhv2c+wuv70+R4/27xixYoBQRgQhAFBGBCEAUEYEIQBYXyO8bM9Fz81Z3ja+RLT7/V6GisGBGFAEAYEYUAQBgRhQBAGhGNzjOnztk+ZPqfi1nurbr0Xa+Utvw8rVgwIwoAgDAjCgCAMCMKAIAwI23OMt3yfftf0uRbTpucbK9/198GKAUEYEIQBQRgQhAFBGBCEAWF7jjH9/f7pfQJP27ewMr0v4mnnhNz6vVqxYkAQBgRhQBAGBGFAEAYEYUD4+PH1ufUXpucJp9yae5y6/im35ki3zhc/dX0rBgRhQBAGBGFAEAYEYUAQBoRj52Ocev799vnD9HP6lVufu+vUPo1T11+xYkAQBgRhQBAGBGFAEAYEYUA4th/ju36Pf+XW+4523bqft89zrBgQhAFBGBCEAUEYEIQBQRgQrr1Xatdb9lc87fzvp+0bWXna/MeKAUEYEIQBQRgQhAFBGBCEAWH7vVK39j+svGWeMO1p84fd+9n9d3TON1wgDAjCgCAMCMKAIAwIwoBw7HyM6bnBrfc+rZx6fj+93+Pt/7+3WDEgCAOCMCAIA4IwIAgDgjAgbM8x3nJOxa3Pfctz+un7v7VPwznfMEgYEIQBQRgQhAFBGBCEAeHYfoyVp+3TuOXUvovpecit+cbu/UyzYkAQBgRhQBAGBGFAEAYEYUAYPx9jer/E9HP0adP387T3Pk2fg3GKFQOCMCAIA4IwIAgDgjAgCAPC+Hulbp3/MP3cfffPn/o5vGU/w8pb9qVYMSAIA4IwIAgDgjAgCAOCMCCM78dYOfU9+7e8B+lpc56Vp80TbrFiQBAGBGFAEAYEYUAQBgRhQDh2Psat59zTz/W/q1tzkunrnGLFgCAMCMKAIAwIwoAgDAjCgPDx4+vz9j38r6bfyzQ9z3nLPpaVW/OK3fu3YkAQBgRhQBAGBGFAEAYEYUA4dj7G03zX9x2dmqtM76O4dS74qc+1YkAQBgRhQBAGBGFAEAYEYUA49l6pW3OD6bnK9PkSp9z6+X/Xz7ViQBAGBGFAEAYEYUAQBgRhQDg2x1iZfg/S9HVOfe9/+nzx6XPNb81hbv3+WDEgCAOCMCAIA4IwIAgDgjAgjM8xnubW/opb+zR25xu3zsGYnsPssmJAEAYEYUAQBgRhQBAGBGFA+OnmGCvT5zBMny++a/p8iZWnnZu+YsWAIAwIwoAgDAjCgCAMCMKAMD7HeNp526fmFdPP15+2P2H3+rf2sTjnGwYJA4IwIAgDgjAgCAOCMCAcm2NMPy8/Zfq5+66nzXlu/Ts+7edgxYAgDAjCgCAMCMKAIAwIwoDw8ePr8/Y9wONYMSAIA4IwIAgDgjAgCAOCMCAIA4IwIAgDgjAgCAOCMCAIA4IwIPwLC18YnSKoLKgAAAAASUVORK5CYII=" alt="探索班 QR code">
+          <div class="qrcap">探索班<span class="pill exp">簡化介入</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="n">步驟二</span>
+    <p class="t">掃碼後加入官方帳號</p>
+    <p class="d">家長以手機掃描說明單上之 QR code，進入加入好友畫面。畫面僅顯示班別名稱，不出現組別等研究術語。</p>
+    <div class="phone">
+      <div class="bar"><span>9:41</span><span>WiFi</span></div>
+      <div class="add">
+        <div class="ava">演</div>
+        <p class="nm">看懂演算法親子課－首頁班</p>
+        <p class="mini">親子共學・五週線上課程</p>
+        <button class="btn">加入</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="n">步驟三</span>
+    <p class="t">收到歡迎訊息與前測連結</p>
+    <p class="d">加入後即刻收到開場訊息 W0-1，兩組內容相同；訊息末附前測問卷連結，完成前測後正式納入研究。</p>
+    <div class="phone">
+      <div class="bar"><span>9:41</span><span>WiFi</span></div>
+      <div class="hd">看懂演算法親子課－首頁班</div>
+      <div class="chat">
+        <div class="bub">您好，歡迎加入。<br>接下來五週，我們不會考您任何名詞。<br>只想先問一個問題：您有沒有發現，孩子的 YouTube 首頁和您的完全不一樣？<br>那不是巧合。這五週，我們一起把它看懂。<br>每週只要花二十分鐘，和孩子做一件事。</div>
+        <div class="time">W0-1・兩組皆收到</div>
+        <div style="height:10px"></div>
+        <div class="bub">開始之前，請先花約十分鐘填寫第一份問卷。<br>填完就正式加入囉。<br><b>▸ 前測問卷</b></div>
+        <div class="time">9:41</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="note">說明：本頁為研究說明用之流程示意。QR code 為版面配置用之示意圖樣，連結非正式帳號，正式施測前將更換為兩組實際之官方帳號連結。班別名稱「首頁班」與「探索班」為家長端所見之名稱，對應研究設計之完整介入組與簡化介入組；家長端全程不出現實驗組、對照組等用語。</p>
+
+</body></html>

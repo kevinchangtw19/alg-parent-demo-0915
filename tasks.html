@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>親子共學任務｜五單元 demo</title>
+<style>
+:root{
+  --bg:#F3EDE1; --surface:#FBF7F0; --line:#E2D6C0; --line-soft:#EFE7D8;
+  --ink:#241F1A; --ink-2:#5F574C; --ink-3:#9A9084; --track:#EDE4D3;
+  --clay:#C97A45; --clay-deep:#A85D2E; --clay-tint:#FBEEE1; --clay-line:#EBD3B4;
+  --moss:#4E8A62; --moss-deep:#3A6B4B; --moss-tint:#E7F0E7; --moss-line:#CDE0D2;
+  --u1:#7FA3BE; --u2:#D08C55; --u3:#6E9E77; --u4:#A98BB8; --u5:#8792C0;
+  --r-sm:10px; --r-md:16px; --r-lg:20px; --r-pill:999px;
+  --sh-1:0 2px 8px rgba(74,58,38,.06); --sh-2:0 8px 22px rgba(74,58,38,.10); --sh-3:0 22px 44px rgba(74,58,38,.20);
+  --serif:"Noto Serif TC","Songti TC",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --base:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(120% 70% at 50% -10%,#FDF1DF 0%,rgba(253,241,223,0) 62%),var(--bg);
+     color:var(--ink);font-family:var(--sans);font-size:var(--base);line-height:1.8;-webkit-font-smoothing:antialiased}
+body.big{--base:18.5px}
+.wrap{max-width:760px;margin:0 auto;padding:22px 18px 70px}
+
+.topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.btn{border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-pill);padding:9px 17px;font:700 14px var(--sans);color:var(--ink);cursor:pointer;transition:.18s var(--ease)}
+.btn:hover{box-shadow:var(--sh-1);transform:translateY(-1px)}
+.btn.primary{background:var(--moss);border-color:var(--moss);color:#fff}
+.btn.primary:hover{background:var(--moss-deep)}
+.btn.clay{background:var(--clay);border-color:var(--clay);color:#fff}
+.btn:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
+.spacer{flex:1}
+
+/* ===== 首頁 ===== */
+.hero{text-align:center;padding:12px 6px 6px}
+.hero .kick{font:900 11px var(--sans);letter-spacing:.24em;color:var(--clay)}
+.hero h1{font:700 30px/1.3 var(--serif);margin:8px 0 6px}
+.hero p{margin:0 auto;max-width:540px;font-size:14.5px;color:var(--ink-2)}
+.prog{max-width:520px;margin:18px auto 4px}
+.prog .track{height:12px;background:var(--track);border-radius:var(--r-pill);overflow:hidden}
+.prog .track>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--clay),var(--moss));transition:.5s var(--ease)}
+.prog .lab{font:700 12.5px var(--mono);color:var(--ink-2);text-align:center;margin-top:7px;letter-spacing:.04em}
+
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:22px}
+@media(max-width:600px){.cards{grid-template-columns:1fr}}
+.ucard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-2);overflow:hidden;cursor:pointer;transition:.2s var(--ease);position:relative;display:flex;flex-direction:column}
+.ucard:hover{box-shadow:var(--sh-3);transform:translateY(-3px)}
+.ucard .bar{height:8px}
+.ucard .in{padding:16px 17px 17px;flex:1;display:flex;flex-direction:column}
+.ucard .wk{font:700 10.5px var(--mono);letter-spacing:.14em;color:var(--clay-deep)}
+.ucard h3{font:700 20px/1.4 var(--serif);margin:7px 0 3px}
+.ucard .tn{font-size:14px;color:var(--ink-2)}
+.ucard .meta{margin-top:12px;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-3);flex-wrap:wrap}
+.pill{border-radius:var(--r-pill);padding:3px 10px;font:700 11.5px var(--sans);border:1px solid var(--line);background:#fff;color:var(--ink-2)}
+.pill.done{background:var(--moss-tint);border-color:var(--moss-line);color:var(--moss-deep)}
+.ucard .go{margin-top:12px;font:700 13.5px var(--sans);color:var(--clay-deep)}
+
+/* ===== 單元內頁 ===== */
+.uhead{text-align:center;padding:6px 4px 2px}
+.uhead .wk{font:700 10.5px var(--mono);letter-spacing:.14em;color:var(--clay-deep)}
+.uhead h2{font:700 26px/1.35 var(--serif);margin:7px 0 4px}
+.uhead .tn{font-size:14.5px;color:var(--ink-2)}
+.concept{background:var(--clay-tint);border:1px solid var(--clay-line);border-radius:var(--r-md);padding:13px 16px;margin:16px 0 6px;font-size:14.5px;line-height:1.85;color:#5b4632}
+.concept b{display:block;font:700 12px var(--sans);letter-spacing:.08em;color:var(--clay-deep);margin-bottom:4px}
+
+.dots{display:flex;gap:6px;justify-content:center;margin:18px 0 14px;flex-wrap:wrap}
+.dot{border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-pill);padding:5px 12px;font:700 12px var(--sans);color:var(--ink-3);cursor:pointer;transition:.16s var(--ease)}
+.dot.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.dot.past{color:var(--moss-deep);border-color:var(--moss-line);background:var(--moss-tint)}
+
+.step{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-2);padding:22px 22px 24px;animation:fade .32s var(--ease) both}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.step .n{font:700 11px var(--mono);letter-spacing:.16em;color:var(--clay-deep)}
+.step h3{font:700 22px/1.4 var(--serif);margin:6px 0 12px}
+.step .body{font-size:var(--base);line-height:1.9;color:var(--ink)}
+.nav{display:flex;gap:10px;margin-top:20px;align-items:center}
+
+/* ===== 互動元件 ===== */
+.io{margin-top:18px;border-top:1px dashed var(--line);padding-top:18px}
+.io .lb{font:700 13px var(--sans);color:var(--clay-deep);letter-spacing:.05em;margin-bottom:10px}
+table.sheet{width:100%;border-collapse:collapse;font-size:14.5px}
+table.sheet th,table.sheet td{border:1px solid var(--line);padding:7px 8px;vertical-align:middle}
+table.sheet th{background:var(--clay-tint);font:700 13.5px var(--sans);color:#5b4632;text-align:center}
+table.sheet td.rh{background:var(--track);font:700 13px var(--sans);width:78px;text-align:center;color:var(--ink-2)}
+table.sheet input{width:100%;border:none;background:none;font:inherit;font-size:14.5px;color:var(--ink);padding:4px 2px;outline:none}
+table.sheet input:focus{background:var(--moss-tint);border-radius:5px}
+tr.last td.rh{font-size:12px;line-height:1.4}
+
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+@media(max-width:560px){.opts{grid-template-columns:1fr}}
+.opt{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);background:#fff;border-radius:var(--r-sm);padding:11px 13px;cursor:pointer;font-size:15px;transition:.16s var(--ease)}
+.opt:hover{border-color:var(--clay-line);background:var(--clay-tint)}
+.opt input{width:19px;height:19px;accent-color:var(--clay);flex:none;margin:0}
+.opt.sel{border-color:var(--clay);background:var(--clay-tint)}
+.cnt{margin-top:11px;font:700 13px var(--sans);color:var(--moss-deep)}
+.other{margin-top:10px;display:flex;gap:8px;align-items:center;font-size:14.5px}
+.other input{flex:1;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:9px 11px;font:inherit;font-size:14.5px;outline:none}
+.other input:focus{border-color:var(--clay)}
+
+.acts{display:flex;flex-direction:column;gap:9px}
+.act{display:flex;gap:11px;align-items:flex-start;border:1.5px solid var(--line);background:#fff;border-radius:var(--r-sm);padding:11px 13px;cursor:pointer;font-size:15px;transition:.16s var(--ease)}
+.act:hover{border-color:var(--moss-line);background:var(--moss-tint)}
+.act.sel{border-color:var(--moss);background:var(--moss-tint)}
+.act input{width:19px;height:19px;accent-color:var(--moss);flex:none;margin:3px 0 0}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:13px}
+.day{border:1.5px solid var(--line);background:#fff;border-radius:var(--r-sm);padding:10px 2px;text-align:center;cursor:pointer;font:700 12.5px var(--sans);color:var(--ink-3);transition:.16s var(--ease)}
+.day:hover{border-color:var(--moss-line)}
+.day.on{background:var(--moss);border-color:var(--moss);color:#fff}
+.day .tick{display:block;font-size:15px;line-height:1.2;margin-bottom:1px}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:12px}
+@media(max-width:560px){.compare{grid-template-columns:1fr}}
+.feed{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:#fff}
+.feed .fh{padding:9px 12px;font:700 13px var(--sans);color:#fff}
+.feed ol{margin:0;padding:10px 12px 12px 30px;font-size:14px;line-height:1.9}
+.feed li{margin-bottom:2px}
+.simnote{margin-top:9px;font-size:12px;color:var(--ink-3);background:var(--track);border-radius:var(--r-sm);padding:8px 11px;line-height:1.7}
+
+/* 公約／學習單卡片 */
+.pact{border:1px solid var(--moss-line);background:var(--moss-tint);border-radius:var(--r-md);padding:16px 17px;margin-top:4px}
+.pact .ti{font:700 16px var(--serif);color:var(--moss-deep);margin-bottom:11px;text-align:center}
+.pact.clayv{border-color:var(--clay-line);background:var(--clay-tint)}
+.pact.clayv .ti{color:var(--clay-deep)}
+.rule{display:flex;gap:9px;align-items:center;margin-bottom:9px;font-size:14.5px;flex-wrap:wrap}
+.rule .rl{font:700 13.5px var(--sans);color:var(--ink-2);flex:none;min-width:150px}
+.rule input[type=text]{flex:1;min-width:130px;border:none;border-bottom:1.5px solid var(--moss-line);background:none;font:inherit;font-size:14.5px;padding:4px 2px;outline:none}
+.rule input[type=text]:focus{border-color:var(--moss)}
+.pact.clayv .rule input[type=text]{border-bottom-color:var(--clay-line)}
+.pact.clayv .rule input[type=text]:focus{border-color:var(--clay)}
+.stopclause{background:#fff;border:1.5px dashed var(--moss);border-radius:var(--r-sm);padding:11px 13px;font-size:14.5px;margin:11px 0;line-height:1.75}
+.stopclause b{color:var(--moss-deep)}
+.buf{display:flex;align-items:center;gap:7px;font-size:14.5px;margin-bottom:12px;flex-wrap:wrap}
+.buf input{width:64px;border:none;border-bottom:1.5px solid var(--moss-line);background:none;font:inherit;font-size:16px;text-align:center;padding:4px;outline:none}
+.signs{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:520px){.signs{grid-template-columns:1fr}}
+.sign{background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:9px}
+.sign .sl{font:700 12.5px var(--sans);color:var(--ink-2);display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.sign .sl button{border:none;background:none;color:var(--clay-deep);font:700 11.5px var(--sans);cursor:pointer;text-decoration:underline}
+.sign canvas{width:100%;height:78px;display:block;border-bottom:1.5px solid var(--line);touch-action:none;cursor:crosshair;border-radius:4px}
+
+/* 溝通學習單 */
+.say{background:#fff;border:1px solid var(--clay-line);border-radius:var(--r-sm);padding:11px 13px;margin-bottom:9px}
+.say .sh{font:700 13.5px var(--sans);color:var(--clay-deep);margin-bottom:4px}
+.say input,.say textarea{width:100%;border:none;border-bottom:1.5px solid var(--clay-line);background:none;font:inherit;font-size:15px;padding:5px 2px;outline:none;resize:vertical}
+.say input:focus,.say textarea:focus{border-color:var(--clay)}
+.say textarea{min-height:62px;border:1.5px solid var(--clay-line);border-radius:var(--r-sm);padding:9px 11px}
+.echo{display:flex;gap:11px;align-items:flex-start;border:1.5px solid var(--line);background:#fff;border-radius:var(--r-sm);padding:11px 13px;cursor:pointer;font-size:15px;transition:.16s var(--ease);margin-top:4px}
+.echo:hover{border-color:var(--moss-line);background:var(--moss-tint)}
+.echo.sel{border-color:var(--moss);background:var(--moss-tint)}
+.echo input{width:19px;height:19px;accent-color:var(--moss);flex:none;margin:3px 0 0}
+.deckbtn{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;
+  background:linear-gradient(150deg,var(--clay),#B4693C 55%,var(--moss));color:#fff;text-decoration:none;
+  border-radius:var(--r-md);padding:15px 14px;font:700 15.5px var(--sans);
+  box-shadow:var(--sh-2);transition:.18s var(--ease)}
+.deckbtn:hover{transform:translateY(-2px);box-shadow:var(--sh-3)}
+.deckhint2{margin-top:8px;font-size:12.5px;color:var(--ink-3);line-height:1.7;text-align:center}
+
+.done-note{margin-top:16px;background:var(--moss-tint);border:1px solid var(--moss-line);border-radius:var(--r-md);padding:14px 16px;color:var(--moss-deep);font:700 15px var(--sans);text-align:center;animation:fade .35s var(--ease) both}
+.foot{text-align:center;color:var(--ink-3);font-size:11.5px;margin-top:28px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 首頁 ===== -->
+  <section id="home">
+    <div class="topbar">
+      <span class="pill">親子共學任務</span>
+      <span class="spacer"></span>
+      <button class="btn" id="zoom1">Ａ 放大字級</button>
+      <button class="btn" id="reset1">↺ 重設 demo</button>
+    </div>
+
+    <div class="hero">
+      <div class="kick">社群媒體演算法素養家長線上介入</div>
+      <h1>和孩子一起，看懂推薦</h1>
+      <p>五週、五個單元，每週只要 20 分鐘。每個任務都走同一個流程：情境 → 判斷 → 操作 → 風險推演 → 因應 → 反思。</p>
+    </div>
+
+    <div class="prog">
+      <div class="track"><i id="pbar"></i></div>
+      <div class="lab" id="plab"></div>
+    </div>
+
+    <div class="cards" id="cards"></div>
+
+    <div class="foot">示意頁面（實際將以 LINE LIFF 內嵌網頁提供）</div>
+  </section>
+
+  <!-- ===== 單元內頁 ===== -->
+  <section id="unit" style="display:none">
+    <div class="topbar">
+      <button class="btn" id="back">← 回五單元</button>
+      <span class="spacer"></span>
+      <button class="btn" id="zoom2">Ａ 放大字級</button>
+    </div>
+    <div class="uhead">
+      <div class="wk" id="uwk"></div>
+      <h2 id="uti"></h2>
+      <div class="tn" id="utn"></div>
+    </div>
+    <div class="concept" id="ucon"></div>
+    <div class="dots" id="dots"></div>
+    <div class="step" id="step"></div>
+    <div class="nav">
+      <button class="btn" id="prev">← 上一步</button>
+      <button class="btn primary" id="nextb">下一步 →</button>
+      <span class="spacer"></span>
+      <span class="pill" id="stepno"></span>
+    </div>
+    <div id="donebox"></div>
+    <div class="foot">示意頁面（實際將以 LINE LIFF 內嵌網頁提供）</div>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   五單元　六步流程
+   單元一～三、五：文字逐字引自《介入方案範本_20260910》參
+   單元四（親子溝通與管教效能）：2026-09-14 依 W4-1～W4-3 推播新撰，待指導教授審閱
+   ========================================================= */
+var UNITS = {
+1:{wk:'第一週　單元一',name:'演算法覺察與認知素養',title:'「為什麼一直推這個給我？」',task:'首頁大不同',mins:'約 15 分鐘',color:'var(--u1)',
+   concept:'推薦不是隨機的。平台看得到我點了什麼、停留多久、搜尋過什麼，但看不到我為什麼點。每個人的首頁都不一樣，同一個人在不同 App 看到的也不一樣。',
+   steps:[
+    {t:'情境',b:'小安打開 YouTube，首頁第一排全是遊戲攻略。媽媽打開同一個 App，第一排卻是料理和新聞。'},
+    {t:'判斷',b:'一起問：這是巧合嗎？為什麼我們兩個人的首頁不一樣？'},
+    {t:'操作',b:'親子各自打開 YouTube（或孩子最常用的 App）首頁，各記下最前面 5 則內容的主題，填進學習單左右兩欄。',io:'u1'},
+    {t:'風險推演',b:'一起想：如果現在推的不是攻略，而是課金教學、遊戲帳號買賣，或陌生人的直播，會怎麼樣？'},
+    {t:'因應',b:'各自指認一則「其實沒那麼想看的」，說出自己做過什麼可能讓它出現——搜尋過？看完了？停很久？分享過？'},
+    {t:'反思',b:'一起回答一句：「我做了什麼，讓它變成這樣？」'}
+   ]},
+2:{wk:'第二週　單元二',name:'演算法批判素養',title:'「它為什麼想讓我一直看、一直買？」',task:'找出三個「想讓你掏錢」的設計',mins:'約 20 分鐘',color:'var(--u2)',
+   concept:'推薦的順序不只看你喜歡什麼，也看誰付了錢。推薦得準，不等於對你好。同一套機制，換個商品也照樣運作。',
+   steps:[
+    {t:'情境',b:'小安玩到一半，畫面跳出「首儲雙倍！限時 30 分鐘」，他跑來說：「爸爸我想買這個。」'},
+    {t:'判斷',b:'一起問：這個畫面為什麼挑這個時候出現？誰會因為我買了而賺錢？'},
+    {t:'操作',b:'一起打開孩子常玩的遊戲商店頁，或一支攻略、開箱影片，從下方清單找出三個設計。',io:'u2'},
+    {t:'風險推演',b:'延伸一步：同一套機制，如果用來推電子煙、酒或減肥產品，會長什麼樣子？'},
+    {t:'因應',b:'練習一句話：「這是廣告，還是他真的喜歡？」由孩子自己判斷這支影片有沒有收錢。'},
+    {t:'反思',b:'一起回答：「推薦得很準，是不是就等於對我好？」'}
+   ]},
+3:{wk:'第三週　單元三',name:'演算法因應',title:'「我可以控制我的演算法」',task:'訓練演算法七天挑戰',mins:'七天，每天 2 分鐘',color:'var(--u3)',
+   concept:'每一次點擊都在回頭訓練推薦。封鎖是最初階的做法，主動搜尋、取消追蹤、關閉自動播放，才是真正在改變推薦。遇到要花錢、要加陌生人的時候，最有用的一招是先停下來。',
+   steps:[
+    {t:'情境',b:'小安只是想回同學訊息，打開 App 看到一支短影音，回過神已經過了一小時。'},
+    {t:'判斷',b:'一起問：這只是自制力的問題嗎？還有什麼在推他繼續看？'},
+    {t:'操作',b:'親子共做四個動作，各截一張圖：',io:'u3'},
+    {t:'風險推演',b:'問：如果推薦的變成遊戲帳號交易、陌生人私訊，或「千萬不要查」這類獵奇內容，你的下一步是什麼？'},
+    {t:'因應',b:'約定一條「停一下條款」：遇到要花錢、要加陌生人、要給帳號密碼——先停下來，找爸媽。',io:'u3b'},
+    {t:'反思',b:'七天後再看一次首頁，和第一天比較，一起回答：「我的推薦頁變了嗎？是我改變了什麼？」',io:'u3c'}
+   ]},
+4:{wk:'第四週　單元四',name:'親子溝通與管教效能',title:'「我一開口他就關機」',task:'一次好好說',mins:'約 20 分鐘',color:'var(--u4)',
+   concept:'孩子不是不知道規則，是不想被命令。同樣一件事，「你怎麼又在滑」和「我看到你剛剛看了很久、我有點擔心」，孩子接到的是兩回事。行為底下常有沒說出口的需求：想跟同學有話題、想被看見、想放鬆。看見需求，規則才談得下去。',
+   steps:[
+    {t:'情境',b:'有位家長說：我一開口他就關機。孩子正在滑手機，家長一句「你怎麼又在滑」，孩子就不講話了。'},
+    {t:'判斷',b:'一起想：他是不知道規則，還是不想被命令？同樣一件事換個說法，孩子接到的會不會不一樣？'},
+    {t:'操作',b:'挑一則孩子最近看過的推薦內容，用「我看到、我覺得、我希望」開啟對話。孩子回應之後，只做一件事：把他說的話複述一次，不評論。',io:'u4'},
+    {t:'風險推演',b:'一起想：如果每次開口都變成命令或指責，下次他遇到要花錢、遇到陌生人私訊，還會不會願意告訴你？'},
+    {t:'因應',b:'今天可以試一句：「你好像很喜歡這個，跟我說說？」先問需求，再談規則。'},
+    {t:'反思',b:'一起回答：「他這個行為底下，可能有什麼沒說出口的需求？」',io:'u4b'}
+   ]},
+5:{wk:'第五週　單元五',name:'家庭數位公約',title:'「我們家的演算法公約」',task:'三條規則＋一張說明卡',mins:'約 20 分鐘',color:'var(--u5)',
+   concept:'一支一支封鎖，成本太高，而且鎖不完。與其事後阻擋，不如事先講好。規則要留緩衝，孩子才守得住。',
+   steps:[
+    {t:'情境',b:'有位爸爸說，他幫孩子鎖 YouTube Kids 的內容，鎖到後來發現「鎖不完」。'},
+    {t:'判斷',b:'一起問：如果一支一支封鎖不是辦法，我們家可以先講好什麼？'},
+    {t:'操作',b:'共同訂出三條規則，加上一條停一下條款，寫在同一張紙上，親子一起簽名。',io:'u5'},
+    {t:'風險推演',b:'討論：規則被打破的時候會是什麼情況？先想好那時候怎麼辦。'},
+    {t:'因應',b:'親子共創一張「這支影片為什麼會推薦給我？」說明卡，或十五秒短影音，用自己的話解釋一次。'},
+    {t:'反思',b:'一起回答：「我的推薦頁，正在把我變成什麼樣的使用者？」'}
+   ]}
+};
+
+var U2OPTS = ['限時倒數','首儲禮包','抽卡動畫','進度只差一點','自動播下一支','留言區都在推薦','免費試玩後要付費','限量、剩最後幾個'];
+var U3ACTS = ['對不想看的內容按「不感興趣」','取消追蹤一個帳號','主動搜尋一個真正想看的主題，並且看完','關閉自動播放與非必要通知'];
+var LV4 = [['第一級　離開','滑掉、退出'],['第二級　回饋','按不感興趣、封鎖、檢舉'],['第三級　主動管理','主動搜尋、取消追蹤、調整通知、不讓推薦頁成為唯一入口'],['第四級　批判查證','跨平台比對、問可信任的大人、遇到交易先停下']];
+var U4NEEDS = ['想跟同學有話題','想被看見','想放鬆'];
+var FEED_BEFORE = ['遊戲攻略：這樣抽必中','限時首儲雙倍！開箱','抽卡 100 抽實測','帳號交易教學','千萬不要查的影片'];
+var FEED_AFTER  = ['自己搜尋的：籃球基本動作','遊戲攻略（仍有，但變少）','自然科小實驗','喜歡的頻道新片','料理：十分鐘晚餐'];
+
+/* ===== 狀態 ===== */
+function blank(){
+  return {done:{},
+    u1:{rows:[['',''],['',''],['',''],['',''],['','']], why:['','']},
+    u2:{sel:[], other:''},
+    u3:{acts:[false,false,false,false], days:[false,false,false,false,false,false,false]},
+    u4:{content:'',see:'',feel:'',hope:'',echo:'',echoed:false,needs:[],needOther:''},
+    u5:{r1:'',r2:'',r3:'',buf:'',sigKid:'',sigParent:''}};
+}
+var S = blank();
+var cur = {u:0, s:0};
+
+function save(){ try{ localStorage.setItem('taskdemo5', JSON.stringify(S)); }catch(e){} }
+function load(){ try{ var d=JSON.parse(localStorage.getItem('taskdemo5')||'null'); if(d) S=Object.assign(blank(),d); }catch(e){} }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ===== 首頁 ===== */
+function renderHome(){
+  var box=document.getElementById('cards'); box.innerHTML='';
+  [1,2,3,4,5].forEach(function(n){
+    var u=UNITS[n], d=!!S.done[n];
+    var el=document.createElement('div'); el.className='ucard';
+    el.innerHTML='<div class="bar" style="background:'+u.color+'"></div><div class="in">'+
+      '<div class="wk">'+esc(u.wk)+'　'+esc(u.name)+'</div>'+
+      '<h3>'+esc(u.title)+'</h3>'+
+      '<div class="tn">任務：'+esc(u.task)+'</div>'+
+      '<div class="meta"><span class="pill">'+esc(u.mins)+'</span>'+
+        '<span class="pill '+(d?'done':'')+'">'+(d?'✓ 已完成':'尚未完成')+'</span></div>'+
+      '<div class="go">'+(d?'再看一次 →':'開始這個單元 →')+'</div></div>';
+    el.onclick=function(){ openUnit(n); };
+    box.appendChild(el);
+  });
+  var c=[1,2,3,4,5].filter(function(n){return S.done[n];}).length;
+  document.getElementById('pbar').style.width=(c/5*100)+'%';
+  document.getElementById('plab').textContent='已完成 '+c+' / 5 個單元';
+}
+
+/* ===== 單元 ===== */
+function openUnit(n){
+  cur.u=n; cur.s=0;
+  document.getElementById('home').style.display='none';
+  document.getElementById('unit').style.display='';
+  try{ history.replaceState(null,'','#u'+n); }catch(e){}
+  window.scrollTo(0,0);
+  renderUnit();
+}
+function goHome(){
+  document.getElementById('unit').style.display='none';
+  document.getElementById('home').style.display='';
+  try{ history.replaceState(null,'',location.pathname); }catch(e){}
+  window.scrollTo(0,0);
+  renderHome();
+}
+function renderUnit(){
+  var u=UNITS[cur.u];
+  document.getElementById('uwk').textContent=u.wk+'　'+u.name;
+  document.getElementById('uti').textContent=u.title;
+  document.getElementById('utn').textContent='親子共學任務：'+u.task+'（'+u.mins+'）';
+  document.getElementById('ucon').innerHTML='<b>這一週希望家長理解的</b>'+esc(u.concept);
+  var dots=document.getElementById('dots'); dots.innerHTML='';
+  u.steps.forEach(function(st,i){
+    var b=document.createElement('button');
+    b.className='dot'+(i===cur.s?' on':(i<cur.s?' past':''));
+    b.textContent=(i+1)+'　'+st.t;
+    b.onclick=function(){ cur.s=i; renderUnit(); };
+    dots.appendChild(b);
+  });
+  var st=u.steps[cur.s];
+  var host=document.getElementById('step');
+  host.innerHTML='<div class="n">STEP '+(cur.s+1)+' / 6</div><h3>'+esc(st.t)+'</h3><div class="body">'+esc(st.b)+'</div>';
+  if(st.io){ var io=document.createElement('div'); io.className='io'; host.appendChild(io); buildIO(st.io, io); }
+  document.getElementById('prev').disabled = cur.s===0;
+  document.getElementById('nextb').textContent = cur.s===5 ? '完成本單元 ✓' : '下一步 →';
+  document.getElementById('nextb').className = cur.s===5 ? 'btn clay' : 'btn primary';
+  document.getElementById('stepno').textContent='第 '+(cur.s+1)+' 步／共 6 步';
+  document.getElementById('donebox').innerHTML='';
+}
+
+/* ===== 互動元件 ===== */
+function buildIO(key, host){
+  if(key==='u1'){
+    var h='<div class="lb">學習單 A：首頁大不同</div><table class="sheet"><tr><th style="width:78px"></th><th>爸爸／媽媽的首頁</th><th>孩子的首頁</th></tr>';
+    for(var i=0;i<5;i++){
+      h+='<tr><td class="rh">第 '+(i+1)+' 則</td>'+
+         '<td><input data-k="r'+i+'0" value="'+esc(S.u1.rows[i][0])+'" placeholder="主題…"></td>'+
+         '<td><input data-k="r'+i+'1" value="'+esc(S.u1.rows[i][1])+'" placeholder="主題…"></td></tr>';
+    }
+    h+='<tr class="last"><td class="rh">我最近做了什麼，可能造成這些？</td>'+
+       '<td><input data-k="w0" value="'+esc(S.u1.why[0])+'" placeholder="搜尋過？看完了？停很久？"></td>'+
+       '<td><input data-k="w1" value="'+esc(S.u1.why[1])+'" placeholder="搜尋過？看完了？停很久？"></td></tr></table>';
+    host.innerHTML=h;
+    host.addEventListener('input',function(e){
+      var k=e.target.dataset.k; if(!k) return;
+      if(k[0]==='r'){ S.u1.rows[+k[1]][+k[2]]=e.target.value; }
+      else{ S.u1.why[+k[1]]=e.target.value; }
+      save();
+    });
+  }
+
+  if(key==='u2'){
+    var h2='<div class="lb">學習單 B：勾出你們找到的設計（目標 3 個）</div><div class="opts">';
+    U2OPTS.forEach(function(o,i){
+      var on=S.u2.sel.indexOf(i)>-1;
+      h2+='<label class="opt'+(on?' sel':'')+'"><input type="checkbox" data-i="'+i+'"'+(on?' checked':'')+'><span>'+esc(o)+'</span></label>';
+    });
+    h2+='</div><div class="other">☐ 其他：<input data-other value="'+esc(S.u2.other)+'" placeholder="你們發現的其他設計…"></div>'+
+        '<div class="cnt" id="u2cnt"></div>';
+    host.innerHTML=h2;
+    var upd=function(){
+      var n=S.u2.sel.length;
+      document.getElementById('u2cnt').textContent='已勾選 '+n+' 個'+(n>=3?'　✓ 達成本週目標':'　（再找 '+(3-n)+' 個）');
+    };
+    host.addEventListener('change',function(e){
+      if(e.target.dataset.i!==undefined){
+        var i=+e.target.dataset.i, p=S.u2.sel.indexOf(i);
+        if(e.target.checked){ if(p<0) S.u2.sel.push(i); } else if(p>-1){ S.u2.sel.splice(p,1); }
+        e.target.closest('.opt').classList.toggle('sel', e.target.checked);
+        upd(); save();
+      }
+    });
+    host.addEventListener('input',function(e){
+      if(e.target.hasAttribute('data-other')){ S.u2.other=e.target.value; save(); }
+    });
+    upd();
+  }
+
+  if(key==='u3'){
+    var h3='<div class="lb">四個動作（各截一張圖；本 demo 以勾選代替）</div><div class="acts">';
+    U3ACTS.forEach(function(a,i){
+      h3+='<label class="act'+(S.u3.acts[i]?' sel':'')+'"><input type="checkbox" data-a="'+i+'"'+(S.u3.acts[i]?' checked':'')+'><span><b>'+(i+1)+'.</b> '+esc(a)+'</span></label>';
+    });
+    h3+='</div><div class="lb" style="margin-top:16px">七天打卡表</div><div class="days">';
+    for(var d=0;d<7;d++){
+      h3+='<div class="day'+(S.u3.days[d]?' on':'')+'" data-d="'+d+'"><span class="tick">'+(S.u3.days[d]?'✓':'·')+'</span>第 '+(d+1)+' 天</div>';
+    }
+    h3+='</div><div class="cnt" id="u3cnt"></div>';
+    host.innerHTML=h3;
+    var u3upd=function(){
+      var a=S.u3.acts.filter(Boolean).length, dd=S.u3.days.filter(Boolean).length;
+      document.getElementById('u3cnt').textContent='動作 '+a+' / 4　·　打卡 '+dd+' / 7 天'+(a===4&&dd===7?'　✓ 七天挑戰完成':'');
+    };
+    host.addEventListener('change',function(e){
+      if(e.target.dataset.a!==undefined){
+        S.u3.acts[+e.target.dataset.a]=e.target.checked;
+        e.target.closest('.act').classList.toggle('sel',e.target.checked);
+        u3upd(); save();
+      }
+    });
+    host.addEventListener('click',function(e){
+      var d=e.target.closest('.day'); if(!d) return;
+      var i=+d.dataset.d; S.u3.days[i]=!S.u3.days[i];
+      d.classList.toggle('on',S.u3.days[i]);
+      d.querySelector('.tick').textContent=S.u3.days[i]?'✓':'·';
+      u3upd(); save();
+    });
+    u3upd();
+  }
+
+  if(key==='u3b'){
+    var h4='<div class="lb">因應能力四級（家長參考）</div><table class="sheet">';
+    LV4.forEach(function(r){ h4+='<tr><td class="rh" style="width:120px">'+esc(r[0])+'</td><td style="padding:9px 11px">'+esc(r[1])+'</td></tr>'; });
+    h4+='</table><div class="stopclause" style="margin-top:12px"><b>停一下條款</b>：遇到<b>要花錢、要加陌生人、要給帳號密碼</b>——先停下來，找爸媽。</div>';
+    host.innerHTML=h4;
+  }
+
+  if(key==='u3c'){
+    var dd=S.u3.days.filter(Boolean).length;
+    var h5='<div class="lb">七天後，首頁變了嗎？</div><div class="compare">'+
+      '<div class="feed"><div class="fh" style="background:var(--u2)">第 1 天的推薦頁</div><ol>'+
+        FEED_BEFORE.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol></div>'+
+      '<div class="feed"><div class="fh" style="background:var(--u3)">第 7 天的推薦頁</div><ol>'+
+        FEED_AFTER.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol></div></div>'+
+      '<div class="simnote">※ <b>示意畫面</b>，非真實資料。實際任務請家長與孩子於第七天各自打開首頁，與第一天的紀錄比較。'+
+      (dd<7?'（目前打卡 '+dd+' / 7 天）':'（七天打卡已完成）')+'</div>';
+    host.innerHTML=h5;
+  }
+
+  /* ===== 單元四：一次好好說 ===== */
+  if(key==='u4'){
+    var h7='<div class="lb">學習單 D：一次好好說</div><div class="pact clayv">'+
+      '<div class="ti">我看到、我覺得、我希望</div>'+
+      '<div class="say"><div class="sh">挑一則孩子最近看過的推薦內容</div>'+
+        '<input data-k="content" value="'+esc(S.u4.content)+'" placeholder="例如：一支抽卡開箱影片"></div>'+
+      '<div class="say"><div class="sh">我看到…（只描述事實，不加評價）</div>'+
+        '<input data-k="see" value="'+esc(S.u4.see)+'" placeholder="我看到你剛剛看了很久"></div>'+
+      '<div class="say"><div class="sh">我覺得…（說自己的感受，不說他的不是）</div>'+
+        '<input data-k="feel" value="'+esc(S.u4.feel)+'" placeholder="我有點擔心"></div>'+
+      '<div class="say"><div class="sh">我希望…（提出邀請，不下命令）</div>'+
+        '<input data-k="hope" value="'+esc(S.u4.hope)+'" placeholder="我希望我們可以一起看看"></div>'+
+      '<div class="say"><div class="sh">孩子回應之後，把他說的話複述一次（不評論）</div>'+
+        '<textarea data-k="echo" placeholder="你剛剛說的是……">'+esc(S.u4.echo)+'</textarea></div>'+
+      '<label class="echo'+(S.u4.echoed?' sel':'')+'"><input type="checkbox" data-k="echoed"'+(S.u4.echoed?' checked':'')+'>'+
+        '<span>我有把他說的話複述一次，而且<b>沒有</b>加上自己的評論。</span></label>'+
+      '</div>'+
+      '<a class="deckbtn" href="cards.html" target="_blank" rel="noopener">🂠 翻開對話卡　找一句開場白 →</a>'+
+      '<div class="deckhint2">不知道怎麼起頭？抽一張對話卡，照著上面的句子問問看。</div>';
+    host.innerHTML=h7;
+    host.addEventListener('input',function(e){
+      var k=e.target.dataset.k; if(!k||e.target.type==='checkbox') return;
+      S.u4[k]=e.target.value; save();
+    });
+    host.addEventListener('change',function(e){
+      if(e.target.dataset.k==='echoed'){
+        S.u4.echoed=e.target.checked;
+        e.target.closest('.echo').classList.toggle('sel',e.target.checked);
+        save();
+      }
+    });
+  }
+
+  if(key==='u4b'){
+    var h8='<div class="lb">他這個行為底下，可能有什麼沒說出口的需求？</div><div class="opts">';
+    U4NEEDS.forEach(function(o,i){
+      var on=S.u4.needs.indexOf(i)>-1;
+      h8+='<label class="opt'+(on?' sel':'')+'"><input type="checkbox" data-n="'+i+'"'+(on?' checked':'')+'><span>'+esc(o)+'</span></label>';
+    });
+    h8+='</div><div class="other">☐ 其他：<input data-needother value="'+esc(S.u4.needOther)+'" placeholder="你們一起想到的其他需求…"></div>'+
+        '<div class="stopclause" style="border-color:var(--clay);margin-top:13px">今天可以試一句：<b>「你好像很喜歡這個，跟我說說？」</b>　看見需求，規則才談得下去。</div>';
+    host.innerHTML=h8;
+    host.addEventListener('change',function(e){
+      if(e.target.dataset.n!==undefined){
+        var i=+e.target.dataset.n, p=S.u4.needs.indexOf(i);
+        if(e.target.checked){ if(p<0) S.u4.needs.push(i); } else if(p>-1){ S.u4.needs.splice(p,1); }
+        e.target.closest('.opt').classList.toggle('sel', e.target.checked);
+        save();
+      }
+    });
+    host.addEventListener('input',function(e){
+      if(e.target.hasAttribute('data-needother')){ S.u4.needOther=e.target.value; save(); }
+    });
+  }
+
+  /* ===== 單元五：家庭數位公約 ===== */
+  if(key==='u5'){
+    var h6='<div class="lb">家庭數位公約（填完可截圖保存）</div><div class="pact">'+
+      '<div class="ti">我們家的演算法公約</div>'+
+      '<div class="rule"><span class="rl">第一條（什麼時候可以用）</span><input type="text" data-k="r1" value="'+esc(S.u5.r1)+'" placeholder="例如：寫完作業後"></div>'+
+      '<div class="rule"><span class="rl">第二條（一次用多久）</span><input type="text" data-k="r2" value="'+esc(S.u5.r2)+'" placeholder="例如：一次 30 分鐘"></div>'+
+      '<div class="rule"><span class="rl">第三條（什麼情況要先問）</span><input type="text" data-k="r3" value="'+esc(S.u5.r3)+'" placeholder="例如：要下載新 App"></div>'+
+      '<div class="stopclause"><b>停一下條款</b>：遇到<b>要花錢、要加陌生人、要給帳號密碼</b>，先停下來，找爸媽。</div>'+
+      '<div class="buf">緩衝約定：時間到的時候，可以再給 <input type="number" min="0" max="30" data-k="buf" value="'+esc(S.u5.buf)+'" placeholder="3"> 分鐘把手上的事情結束。</div>'+
+      '<div class="signs">'+
+        '<div class="sign"><div class="sl"><span>孩子簽名</span><button data-clr="Kid">清除</button></div><canvas data-sig="Kid"></canvas></div>'+
+        '<div class="sign"><div class="sl"><span>家長簽名</span><button data-clr="Parent">清除</button></div><canvas data-sig="Parent"></canvas></div>'+
+      '</div></div>';
+    host.innerHTML=h6;
+    host.addEventListener('input',function(e){
+      var k=e.target.dataset.k; if(!k) return; S.u5[k]=e.target.value; save();
+    });
+    host.querySelectorAll('canvas[data-sig]').forEach(function(cv){ initSign(cv, cv.dataset.sig); });
+    host.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-clr]'); if(!b) return;
+      var who=b.dataset.clr, cv=host.querySelector('canvas[data-sig="'+who+'"]');
+      var ctx=cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height);
+      S.u5['sig'+who]=''; save();
+    });
+  }
+}
+
+/* ===== 簽名板 ===== */
+function initSign(cv, who){
+  var ratio = window.devicePixelRatio || 1;
+  var w = cv.clientWidth || 260, h = 78;
+  cv.width = w*ratio; cv.height = h*ratio;
+  var ctx = cv.getContext('2d');
+  ctx.scale(ratio,ratio);
+  ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#241F1A';
+  var saved = S.u5['sig'+who];
+  if(saved){ var img=new Image(); img.onload=function(){ ctx.drawImage(img,0,0,w,h); }; img.src=saved; }
+  var drawing=false, last=null;
+  function pos(e){ var r=cv.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; }
+  cv.addEventListener('pointerdown',function(e){ drawing=true; last=pos(e); cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove',function(e){
+    if(!drawing) return;
+    var p=pos(e);
+    ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke();
+    last=p;
+  });
+  function end(){ if(!drawing) return; drawing=false;
+    try{ S.u5['sig'+who]=cv.toDataURL('image/png'); save(); }catch(e){} }
+  cv.addEventListener('pointerup',end);
+  cv.addEventListener('pointerleave',end);
+  cv.addEventListener('pointercancel',end);
+}
+
+/* ===== 導覽 ===== */
+document.getElementById('prev').onclick=function(){ if(cur.s>0){ cur.s--; renderUnit(); window.scrollTo(0,0);} };
+document.getElementById('nextb').onclick=function(){
+  if(cur.s<5){ cur.s++; renderUnit(); window.scrollTo(0,0); return; }
+  S.done[cur.u]=true; save();
+  var u=UNITS[cur.u];
+  document.getElementById('donebox').innerHTML=
+    '<div class="done-note">✓ 已完成　'+esc(u.wk)+'　'+esc(u.name)+'　「'+esc(u.task)+'」<br>'+
+    '<span style="font-weight:400;font-size:13.5px">回到首頁可以看到進度已更新。別忘了回 LINE 回覆「1」打卡。</span></div>';
+  setTimeout(function(){
+    document.getElementById('donebox').scrollIntoView({behavior:'smooth',block:'center'});
+  },60);
+};
+document.getElementById('back').onclick=goHome;
+document.getElementById('reset1').onclick=function(){
+  if(!confirm('重設 demo：會清除所有已填內容與完成狀態。確定嗎？')) return;
+  S=blank();
+  try{ localStorage.removeItem('taskdemo5'); }catch(e){}
+  renderHome();
+};
+function zoom(){ document.body.classList.toggle('big');
+  var t=document.body.classList.contains('big')?'Ａ 還原字級':'Ａ 放大字級';
+  document.getElementById('zoom1').textContent=t; document.getElementById('zoom2').textContent=t;
+  if(cur.u) renderUnit();
+}
+document.getElementById('zoom1').onclick=zoom;
+document.getElementById('zoom2').onclick=zoom;
+
+/* ===== 啟動（支援 #u1～#u5 直接進入） ===== */
+load();
+renderHome();
+var m=(location.hash||'').match(/^#u([1-5])$/);
+if(m) openUnit(+m[1]);
+window.addEventListener('hashchange',function(){
+  var mm=(location.hash||'').match(/^#u([1-5])$/);
+  if(mm) openUnit(+mm[1]); else goHome();
+});
+</script>
+</body>
+</html>
